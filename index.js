@@ -145,6 +145,13 @@ client.on("guildDelete", guild => {
 });
 
 
+client.on('guildMemberAdd', member => {
+  if (storage.getItemSync("lockdown") != 0) {
+    const role = member.guild.roles.cache.find(role => role.name === 'wtc-lockout');
+    member.roles.add(role);
+  }
+});
+
 client.on("message", async message => {
   if(BANNED_CHANNEL_IDS.includes(message.channel.id)) return;
   if(message.author.bot) return;
@@ -422,6 +429,14 @@ client.on("message", async message => {
    }
   }
   
+  if(command === "pre-lockdown") {
+    if(!message.member) return;
+	if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
+      storage.setItemSync('lockdown', 1);
+	  
+	  message.channel.send("#worththecandle is now in pre-lockdown, new users must type +unlock-wtc in #bot-ez to access the channel.");
+	}
+  }
   if(command === "lockdown") {
     if(!message.member) return;
 	if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
@@ -430,7 +445,7 @@ client.on("message", async message => {
 	  const role = message.guild.roles.cache.find(role => role.name === 'wtc-lockout');
 	  message.guild.members.filter(m => !m.user.bot).forEach(member => member.addRole(role));
 	  
-	  message.channel.send("#worththecandle is now in lockdown, users (other than earlybirds) must type +unlock-wtc in #bot-ez to access the channel.");
+	  message.channel.send("#worththecandle is now in lockdown, all users (other than earlybirds) must type +unlock-wtc in #bot-ez to access the channel.");
 	}
   }
   if(command === "lift-lockdown") {
