@@ -430,16 +430,20 @@ client.on("message", async message => {
   }
   
   if(command === "pre-lockdown") {
-    if(!message.member) return;
-	if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
+    if(!message.member) {
+	  message.channel.send("Server use only.");
+	}
+	else if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
       storage.setItemSync('lockdown', 1);
 	  
 	  message.channel.send("#worththecandle is now in pre-lockdown, new users must type +unlock-wtc in #bot-ez to access the channel.");
 	}
   }
   if(command === "lockdown") {
-    if(!message.member) return;
-	if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
+    if(!message.member) {
+	  message.channel.send("Server use only.");
+	}
+	else if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
       storage.setItemSync('lockdown', 2);
 	  
 	  const role = message.guild.roles.cache.find(role => role.name === 'wtc-lockout');
