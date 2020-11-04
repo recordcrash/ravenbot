@@ -403,6 +403,24 @@ client.on("message", async message => {
         message.channel.send("You need more Degrees of Reasonableness in order to use this command in a Direct Message.");
       }
   }
+  
+  if(command === "unlock-wtc") {
+   if(message.member){
+    if (!message.member.roles.cache.some(role => role.name === 'wtc-lockout')) {
+      console.log(message.member.user.tag + "(" + message.member.user + ") used command +unlock-wtc without the role");
+      message.channel.send("You already have access to #worththecandle.");
+    }
+    else{
+      const role = message.guild.roles.cache.find(role => role.name === 'wtc-lockout');
+      console.log(message.member.user.tag + "(" + message.member.user + ") used command +unlock-wtc with the role");
+      message.member.roles.remove(role);
+      message.channel.send("You may now read and post in #worththecandle.");
+    }
+   }
+   else{
+    message.channel.send("Please visit the Alexander Wales Discord server to use this command.");
+   }
+  }
     
   if(command === "testsearch") {
       const searchContent = args.join(" ");
