@@ -421,6 +421,29 @@ client.on("message", async message => {
     message.channel.send("Please visit the Alexander Wales Discord server to use this command.");
    }
   }
+  
+  if(command === "lockdown") {
+    if(!message.member) return;
+	if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
+      storage.setItemSync('lockdown', 2);
+	  
+	  const role = message.guild.roles.cache.find(role => role.name === 'wtc-lockout');
+	  message.guild.members.filter(m => !m.user.bot).forEach(member => member.addRole(role));
+	  
+	  message.channel.send("#worththecandle is now in lockdown, users (other than earlybirds) must type +unlock-wtc in #bot-ez to access the channel.");
+	}
+  }
+  if(command === "lift-lockdown") {
+    if(!message.member) return;
+	if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
+      storage.setItemSync('lockdown', 0);
+	  
+	  const role = message.guild.roles.cache.find(role => role.name === 'wtc-lockout');
+	  message.guild.members.filter(role => role.name === 'wtc-lockout').forEach(member => member.addRole(role));
+	  
+	  message.channel.send("#worththecandle lockdown lifted.");
+	}
+  }
     
   if(command === "testsearch") {
       const searchContent = args.join(" ");
