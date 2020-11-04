@@ -60,12 +60,12 @@ let downloadTask = new cron.CronJob('13 00 00 * * *', downloadHTML);
 
 
 var grep = function(what, where, callback){
-	var exec = require('child_process').exec;
-	exec('\grep "' + what.replace(/"/g,"\\\"") + '" ' + where + ' -hiw -m 5', function(err, stdin, stdout){ 
-		var list = {}
-		var results = stdin.split('\n').slice(0,10);
-	    callback(results)
-	});
+    var exec = require('child_process').exec;
+    exec('\grep "' + what.replace(/"/g,"\\\"") + '" ' + where + ' -hiw -m 5', function(err, stdin, stdout){ 
+        var list = {}
+        var results = stdin.split('\n').slice(0,10);
+        callback(results)
+    });
 }
 
 function authorize(credentials, callback) {
@@ -431,37 +431,37 @@ client.on("message", async message => {
   
   if(command === "pre-lockdown") {
     if(!message.member) {
-	  message.channel.send("Server use only.");
-	}
-	else if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
+      message.channel.send("Server use only.");
+    }
+    else if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
       storage.setItemSync('lockdown', 1);
-	  
-	  message.channel.send("#worththecandle is now in pre-lockdown, new users must type +unlock-wtc in #bot-ez to access the channel.");
-	}
+      
+      message.channel.send("#worththecandle is now in pre-lockdown, new users must type +unlock-wtc in #bot-ez to access the channel.");
+    }
   }
   if(command === "lockdown") {
     if(!message.member) {
-	  message.channel.send("Server use only.");
-	}
-	else if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
+      message.channel.send("Server use only.");
+    }
+    else if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
       storage.setItemSync('lockdown', 2);
-	  
-	  const role = message.guild.roles.cache.find(role => role.name === 'wtc-lockout');
-	  message.guild.members.filter(m => !m.user.bot).forEach(member => member.addRole(role));
-	  
-	  message.channel.send("#worththecandle is now in lockdown, all users (other than earlybirds) must type +unlock-wtc in #bot-ez to access the channel.");
-	}
+      
+      const role = message.guild.roles.cache.find(role => role.name === 'wtc-lockout');
+      message.guild.members.filter(m => !m.user.bot).forEach(member => member.addRole(role));
+      
+      message.channel.send("#worththecandle is now in lockdown, all users (other than earlybirds) must type +unlock-wtc in #bot-ez to access the channel.");
+    }
   }
   if(command === "lift-lockdown") {
     if(!message.member) return;
-	if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
+    if(message.member.roles.cache.some(role => role.name === 'moderator') || message.member.roles.cache.some(role => role.name === '@admin')) {
       storage.setItemSync('lockdown', 0);
-	  
-	  const role = message.guild.roles.cache.find(role => role.name === 'wtc-lockout');
-	  message.guild.members.filter(role => role.name === 'wtc-lockout').forEach(member => member.addRole(role));
-	  
-	  message.channel.send("#worththecandle lockdown lifted.");
-	}
+      
+      const role = message.guild.roles.cache.find(role => role.name === 'wtc-lockout');
+      message.guild.members.filter(role => role.name === 'wtc-lockout').forEach(member => member.addRole(role));
+      
+      message.channel.send("#worththecandle lockdown lifted.");
+    }
   }
     
   if(command === "testsearch") {
