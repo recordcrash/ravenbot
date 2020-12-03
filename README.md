@@ -26,6 +26,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ### Roadmap
 Features I would like to add in the future are listed below:
 * A search feature that doesn't suck (would probably require tagging and processing all chapters of the story by hand)
+* Move images into a files/ or images/ folder so I'm not a walking embarrassment
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
