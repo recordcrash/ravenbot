@@ -360,6 +360,7 @@ client.on("message", async (message) => {
       {
         spreadsheetId: WOG_SPREADSHEET,
         range: "D9:E105",
+        valueRenderOption: 'FORMULA'
       },
       (err, res) => {
         if (err) {
@@ -376,7 +377,7 @@ client.on("message", async (message) => {
             .setAuthor("Alexander Wales", "https://www.royalroadcdn.com/avatars/avatar-119608.png")
             .setDescription(wogs[randomIndex]);
           if (links[randomIndex])
-            wogEmbed.addFields({ name: "Link", value: links[randomIndex] });
+            wogEmbed.addFields({ name: "Link", value: links[randomIndex].match(/=hyperlink\("([^"]+)"/i) ? links[randomIndex].match(/=hyperlink\("([^"]+)"/i)[1] : 'Error fetching link' });
           message.channel.send(wogEmbed);
         }
       }
