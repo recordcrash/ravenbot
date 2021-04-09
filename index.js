@@ -41,6 +41,20 @@ const WORDS_SPREADSHEET = '1PaLrwVYgxp_SYHtkred7ybpSJPHL88lf4zB0zMKmk1E';
 const TEST_SPREADSHEET = '1XIN9kXAQRKqwrlyDRXk4L56AwZoYaIR_0hjoJJ7Ab-g';
 const WOG_SPREADSHEET = '1VHV6cOq_Gw5y9mOlHmge42t8lvIssrSzK7jWrSqN8qQ';
 
+function generatePower() {
+  var powers = ["Telekinesis", "Water manipulation", "Fire manipulation", "Earth manipulation", "Air manipulation", "Telekinesis", "Teleportation", "Super speed", "Super strength", "Emotional manipulation", "Cloning", "Precognition", "Clairvoyance", "Lasers", "Invisibility", "Shapeshifting", "Flight", "Electric manipulation", "Telepathy", "Regeneration", "Healing", "Memory manipulation", "Time travel", "Illusions", "Animal control", "Portals", "Probabilty manipulation", "Shields", "Plant manipulation", "Sound manipulation", "Summoning", "Knowledge", "Gravity manipulation", "Meta powers"];
+  var butand = ["but", "and"];
+  var modifiers = ["time", "absorption", "movement", "charging", "heat", "happiness", "fear", "metabolism", "theft", "repetition", "isolation", "crowds", "mass", "velocity", "feedback", "equivalence", "age", "range", "duration", "insanity", "memory", "pain", "self", "Thursday"];
+  var sentence = "";
+	sentence += powers[Math.floor(Math.random()*powers.length)];
+	sentence += ". Yes, ";
+	sentence += butand[Math.floor(Math.random()*butand.length)];
+	sentence += " ";
+	sentence += modifiers[Math.floor(Math.random()*modifiers.length)];
+	sentence += ".";
+  return sentence;
+}
+
 function downloadHTML() {
   // This function downloads the entire story every day so you can search it
   console.log("Attempting to download html");
@@ -177,6 +191,10 @@ client.on("message", async (message) => {
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
 
+  function IntTwoChars(i) {
+    return (`0${i}`).slice(-2);
+  }
+
   function listProgress(auth) {
     const sheets = google.sheets({ version: "v4", auth });
     sheets.spreadsheets.values.get(
@@ -221,6 +239,18 @@ client.on("message", async (message) => {
             });
             var grandTotal = totaldata[k];
             var numbersUp = false;
+            if (storage.getItemSync("grandtotal") !== grandTotal) {
+              let date_ob = new Date();
+              let date = (`0${date_ob.getDate()}`).slice(-2);
+              let month = (`0${date_ob.getMonth() + 1}`).slice(-2);
+              let year = date_ob.getFullYear();
+              let hours = (`0${date_ob.getHours()}`).slice(-2);
+              let minutes = (`0${date_ob.getMinutes()}`).slice(-2);
+              let seconds = (`0${date_ob.getSeconds()}`).slice(-2);
+              let finalDate = `${hours}:${minutes}:${seconds} ${month}/${date}/${year}`;
+              storage.setItemSync("updateDate", finalDate);
+              console.log("Sheet updated: update date: " + finalDate);
+            }
             if (storage.getItemSync("grandtotal") < grandTotal) {
               numbersUp = true;
               console.log("Numbers went up! New grand total: " + grandTotal);
@@ -310,6 +340,11 @@ client.on("message", async (message) => {
                   name: "Upcoming batch stats",
                   value: totalWords + " words, " + wordsPer + "/day",
                   inline: true,
+                },
+                {
+                  name: "Last sheet update",
+                  value: storage.getItemSync("updateDate") || "No value yet!",
+                  inline: true,
                 }
               );
             if (command === "pogress" || command === "pog") {
@@ -374,7 +409,7 @@ client.on("message", async (message) => {
           const randomIndex = Math.floor(Math.random() * wogs.length);
           const wogEmbed = new Discord.MessageEmbed()
             .setColor("#A4DACC")
-            .setAuthor("Alexander Wales", "https://www.royalroadcdn.com/avatars/avatar-119608.png")
+            .setAuthor("Alexander Wales", "https://www.royalroadcdn.com/public/avatars/avatar-119608.png")
             .setDescription(wogs[randomIndex]);
           if (links[randomIndex])
             wogEmbed.addFields({ name: "Link", value: links[randomIndex].match(/=hyperlink\("([^"]+)"/i) ? links[randomIndex].match(/=hyperlink\("([^"]+)"/i)[1] : 'Error fetching link' });
@@ -416,6 +451,7 @@ client.on("message", async (message) => {
           value:
             "Adds the role Rationally Writing to the user, in order to be reminded of new AW podcast releases. Use again to remove.",
         },
+        { name: "+power", value: "Outputs a random Alexander Walesque superpower with a drawback." },
         {
           name: "+testsearch <search term>",
           value:
@@ -440,6 +476,22 @@ client.on("message", async (message) => {
         m.createdTimestamp - message.createdTimestamp
       }ms. API Latency is ${Math.round(client.ws.ping)}ms`
     );
+  }
+
+  if (command === "power") {
+    if (message.member) {
+      console.log(
+        message.member.user.tag +
+          "(" +
+          message.member.user +
+          ") used command +power."
+      );
+    } else console.log("Someone used command +power.");
+    const powerEmbed = new Discord.MessageEmbed()
+      .setColor("#A4DACC")
+      .setAuthor("Alexander Wales", "https://www.royalroadcdn.com/public/avatars/avatar-119608.png")
+      .setDescription(generatePower());
+    message.channel.send(powerEmbed);
   }
 
   /*removed after the great ravening of 2020
