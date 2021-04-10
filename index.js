@@ -42,9 +42,11 @@ const TEST_SPREADSHEET = '1XIN9kXAQRKqwrlyDRXk4L56AwZoYaIR_0hjoJJ7Ab-g';
 const WOG_SPREADSHEET = '1VHV6cOq_Gw5y9mOlHmge42t8lvIssrSzK7jWrSqN8qQ';
 
 function generatePower() {
-  var powers = ["Telekinesis", "Water manipulation", "Fire manipulation", "Earth manipulation", "Air manipulation", "Telekinesis", "Teleportation", "Super speed", "Super strength", "Emotional manipulation", "Cloning", "Precognition", "Clairvoyance", "Lasers", "Invisibility", "Shapeshifting", "Flight", "Electric manipulation", "Telepathy", "Regeneration", "Healing", "Memory manipulation", "Time travel", "Illusions", "Animal control", "Portals", "Probabilty manipulation", "Shields", "Plant manipulation", "Sound manipulation", "Summoning", "Knowledge", "Gravity manipulation", "Meta powers"];
+  var powers = ["Telekinesis", "Water manipulation", "Fire manipulation", "Earth manipulation", "Air manipulation", "Telekinesis", "Teleportation", "Super speed", "Super strength", "Emotional manipulation", "Cloning", "Precognition", "Clairvoyance", "Lasers", "Invisibility", "Shapeshifting", "Flight", "Electric manipulation", "Telepathy", "Regeneration", "Healing", "Memory manipulation", "Time travel", "Illusions", "Animal control", "Portals", "Probabilty manipulation", "Shields", "Plant manipulation", "Sound manipulation", "Summoning", "Knowledge", "Gravity manipulation", "Meta powers",\
+    "Phasing", "Technopathy", "Gadget creation", "Crystal manipulation", "Flow manipulation", "Cryokinesis", "Space manipulation", "Physiological adaptation", "Venomous nature", "Quills", "Gas breath", "Slime glands", "Kinetic manipulation", "Mind domination", "Time manipulation", "Disintegration", "Subspace generation"];
   var butand = ["but", "and"];
-  var modifiers = ["time", "absorption", "movement", "charging", "heat", "happiness", "fear", "metabolism", "theft", "repetition", "isolation", "crowds", "mass", "velocity", "feedback", "equivalence", "age", "range", "duration", "insanity", "memory", "pain", "self", "Thursday"];
+  var modifiers = ["time", "absorption", "movement", "charging", "heat", "happiness", "fear", "metabolism", "theft", "repetition", "isolation", "crowds", "mass", "velocity", "feedback", "equivalence", "age", "range", "duration", "insanity", "memory", "pain", "self", "Thursday",\
+    "sleep", "visible mutation"];
   var sentence = "";
 	sentence += powers[Math.floor(Math.random()*powers.length)];
 	sentence += ". Yes, ";
