@@ -16,7 +16,7 @@ export const BANNED_CHANNEL_IDS = [
 ];
 
 export const WORDS_SPREADSHEET = '1PaLrwVYgxp_SYHtkred7ybpSJPHL88lf4zB0zMKmk1E';
-// const TEST_SPREADSHEET = '1XIN9kXAQRKqwrlyDRXk4L56AwZoYaIR_0hjoJJ7Ab-g';
+export const TEST_SPREADSHEET = '1XIN9kXAQRKqwrlyDRXk4L56AwZoYaIR_0hjoJJ7Ab-g';
 export const WOG_SPREADSHEET = '1VHV6cOq_Gw5y9mOlHmge42t8lvIssrSzK7jWrSqN8qQ';
 
 export const POWERS = ['Telekinesis', 'Water manipulation', 'Fire manipulation',
@@ -29,7 +29,7 @@ export const POWERS = ['Telekinesis', 'Water manipulation', 'Fire manipulation',
   'Sound manipulation', 'Summoning', 'Knowledge', 'Gravity manipulation',
   'Meta powers', 'Intangibility', 'Technopathy', 'Gadget creation',
   'Crystal manipulation', 'Flow manipulation', 'Cryokinesis', 'Space manipulation',
-  'Physiological adaptation', 'Venomous phisiology', 'Quills', 'Gas breath',
+  'Physiological adaptation', 'Venomous physiology', 'Quills', 'Gas breath',
   'Slime manipulation', 'Force manipulation', 'Mind control', 'Time manipulation',
   'Disintegration', 'Subspace generation', 'Weapons', 'Armor', 'Acid manipulation',
   'Vapor manipulation', 'Weather manipulation', 'Matter generation',
