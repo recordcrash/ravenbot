@@ -268,7 +268,9 @@ client.on("message", async (message) => {
           //Special case: batch ready and upcoming, or already out with no progress
           else if (j - i == 0) {
             for (var l = i - 1; l > 0; l--) {
-              if (batches[l]) break;
+              if (batches[l]){
+                break;
+              };
             }
             var newdate = i;
             i = l; //amazing variable names, I know
