@@ -18,5 +18,10 @@
     "node-persist": "^2.1.0",
     "showdown": "^1.9.1",
     "turndown": "^6.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.28.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4"
   }
 }
