@@ -6,10 +6,10 @@
 // Modified version of Federico Grandi's cron solution to time checking in https://stackoverflow.com/a/53822507
 // Everything else by Makin
 
-import {
+const {
   SCOPES, TOKEN_PATH, BANNED_CHANNEL_IDS, WORDS_SPREADSHEET, WOG_SPREADSHEET, POWERS,
   POWER_MODIFIERS,
-} from './config/constants';
+} = require('./config/constants.js');
 
 const Discord = require('discord.js');
 const fs = require('fs');
