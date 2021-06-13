@@ -44,5 +44,112 @@ const POWER_MODIFIERS = ['time', 'absorption', 'movement', 'charging',
   'control', 'precision', 'scale', 'instability', 'knowledge', 'damage', 'speed',
   'versatility', 'durability', 'persistence', 'transformation', 'adaptation'];
 
+const EXPLANATIONS = {
+  'OVDT': {
+    name: 'Only Villains Do That',
+    link: 'https://www.royalroad.com/fiction/40182'
+  },
+  'TFTBN': {
+    name: 'The Flower that Bloomed Nowhere',
+    link: 'https://www.royalroad.com/fiction/28806',
+    message: 'Spoiler discussion in #flower channel'
+  },
+  'FTBN': {
+    name: 'The Flower that Bloomed Nowhere',
+    link: 'https://www.royalroad.com/fiction/28806',
+    message: 'Spoiler discussion in #flower channel'
+  },
+  'FLOWER': {
+    name: 'The Flower that Bloomed Nowhere',
+    link: 'https://www.royalroad.com/fiction/28806',
+    message: 'Spoiler discussion in #flower channel'
+  },
+  'FLWR': {
+    name: 'The Flower that Bloomed Nowhere',
+    link: 'https://www.royalroad.com/fiction/28806',
+    message: 'Spoiler discussion in #flower channel'
+  },
+  'BOC': {
+    name: 'Beware of Chicken',
+    link: 'https://www.royalroad.com/fiction/39408'
+  },
+  'BWOCK': {
+    name: 'Beware of Chicken',
+    link: 'https://www.royalroad.com/fiction/39408'
+  },
+  'BWOC': {
+    name: 'Beware of Chicken',
+    link: 'https://www.royalroad.com/fiction/39408'
+  },
+  'BAWK': {
+    name: 'Beware of Chicken',
+    link: 'https://www.royalroad.com/fiction/39408'
+  },
+  'EE': {
+    name: 'The Elemental Arena',
+    link: 'https://www.royalroad.com/fiction/27800'
+  },
+  'EA': {
+    name: 'The Elemental Arena',
+    link: 'https://www.royalroad.com/fiction/27800'
+  },
+  'DDC': {
+    name: 'Dungeon Crawler Carl',
+    link: 'https://www.royalroad.com/fiction/29358'
+  },
+  'DCC': {
+    name: 'Dungeon Crawler Carl',
+    link: 'https://www.royalroad.com/fiction/29358'
+  },
+  'OWP': {
+    name: 'The Optimised Wish Project',
+    link: 'https://www.fanfiction.net/s/12863641'
+  },
+  'CK': {
+    name: 'Castle Kingside',
+    link: 'https://www.royalroad.com/fiction/43462'
+  },
+  'HWFWM': {
+    name: 'He who Fights with Monsters',
+    link: 'https://www.royalroad.com/fiction/26294'
+  },
+  'TINTF': {
+    name: 'There is Nothing to Fear',
+    link: 'https://www.archiveofourown.org/series/1087368'
+  },
+  'WTC': {
+    name: 'Worth the Candle',
+    link: 'https://www.royalroad.com/fiction/25137'
+  },
+  'TGAB': {
+    name: 'The Gods are Bastards',
+    link: 'https://tiraas.net/'
+  },
+  'GBG': {
+    name: 'Game By God',
+    link: 'Unfortunately, no links are available for this lost Remy serial.'
+  },
+  'POKESEKAI': {
+    name: 'Borne of Caution',
+    link: 'https://forums.spacebattles.com/threads/borne-of-caution-pokemon-isekai.849292/'
+  },
+  'PGTE': {
+    name: 'A Practical Guide to Evil',
+    link: 'https://practicalguidetoevil.wordpress.com/'
+  },
+  'APGTE': {
+    name: 'A Practical Guide to Evil',
+    link: 'https://practicalguidetoevil.wordpress.com/'
+  },
+  'HPMOR': {
+    name: 'Harry Potter and the Methods of Rationality',
+    link: 'http://daystareld.com/hpmor-remix/'
+  },
+  'MOR': {
+    name: 'Harry Potter and the Methods of Rationality',
+    link: 'http://daystareld.com/hpmor-remix/'
+  },
+}
+
 module.exports = { SCOPES, TOKEN_PATH, BANNED_CHANNEL_IDS, WORDS_SPREADSHEET, 
-  TEST_SPREADSHEET, WOG_SPREADSHEET, POWERS, POWER_MODIFIERS }
+  TEST_SPREADSHEET, WOG_SPREADSHEET, POWERS, POWER_MODIFIERS, EXPLANATIONS }

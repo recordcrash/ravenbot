@@ -8,7 +8,7 @@
 
 const {
   SCOPES, TOKEN_PATH, BANNED_CHANNEL_IDS, WORDS_SPREADSHEET, WOG_SPREADSHEET, POWERS,
-  POWER_MODIFIERS,
+  POWER_MODIFIERS, EXPLANATIONS
 } = require('./config/constants.js');
 
 const Discord = require('discord.js');
@@ -168,6 +168,7 @@ client.on('guildDelete', (guild) => {
   console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
   client.user.setActivity('exposition fairy');
 });
+
 
 client.on('message', async (message) => {
   if (BANNED_CHANNEL_IDS.includes(message.channel.id)) return;
@@ -436,6 +437,7 @@ client.on('message', async (message) => {
           value:
             'Shows the current progress of the next Worth the Candle batch of chapters. Please use in #bot-ez.',
         },
+        { name: '+explain/+e', value: 'Given a story\'s acronym, outputs its full name and link. Full list can be accessed with "all" as an argument.' },
         {
           name: '+podcast',
           value:
@@ -633,6 +635,35 @@ client.on('message', async (message) => {
     } else {
       message.channel.send(
         'You need more Degrees of Reasonableness in order to use this command in a Direct Message.',
+      );
+    }
+  }
+  
+  if (command === 'explain' || command === 'e') {
+    const explained = args.join(' ');
+    if (message.member) {
+      console.log(
+        `${message.member.user.tag
+        }(${
+          message.member.user
+        }) used command +explain and asked for '${ explained }'.`,
+      );
+    } else {
+      console.log( `Someone used command +explain and searched '${explained}'.`);
+    }
+    if (explained.toUpperCase() === 'ALL' || explained === '*' || explained === ''){
+      message.channel.send(
+        `The full list of works available to this command is located at <https://discord.com/channels/437695037401464851/437697099383963668/848202602688282655>.`,
+      );
+    }
+    else if (explained.toUpperCase() in EXPLANATIONS) {
+      const story = EXPLANATIONS[explained.toUpperCase()];
+      message.channel.send(
+        `I've found something called ***${story.name}***. Is this what you were looking for? ${story.link}`,
+      );
+    } else {
+      message.channel.send(
+        `I can't find that story among my 32768 books.`,
       );
     }
   }
