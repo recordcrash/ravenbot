@@ -506,7 +506,7 @@ client.on('message', async (message) => {
     } else console.log('Someone used command +powerm.');
     const powermEmbed = new Discord.MessageEmbed()
       .setColor('#A4DACC')
-      .setAuthor('Alexander Wales', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
+      .setAuthor('Alexamder Walesm', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
       .setDescription(generatePowerm());
     message.channel.send(powermEmbed);
   }
