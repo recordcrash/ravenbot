@@ -44,6 +44,46 @@ const POWER_MODIFIERS = ['time', 'absorption', 'movement', 'charging',
   'control', 'precision', 'scale', 'instability', 'knowledge', 'damage', 'speed',
   'versatility', 'durability', 'persistence', 'transformation', 'adaptation'];
 
+const POWERM_ADJECTIVE = ['abnormal','accidental','acute','advanced','applied','asymptomatic','balanced',
+  'bariatric','behavioral','benign','charged','chronic','clinical','somatic','comedic','communicable',
+  'congenital','contractual','crippling','critical','degenerative','delayed','depressive','disabling',
+  'divine','effective','elevated','empty','enchanted','entadic','esoteric','exclusive','explicable',
+  'explosive','explotable','focal','focused','forgettable','free','fulminant','fungal','generalized',
+  'gentle','global','Gygaxian','high stakes','horrific','hypnotic','iconic','idiosyncratic','illusionary',
+  'immaterial','immunizing','inactive','ineffective','infectious','inflammatory','internal','invasive',
+  'lackadaisical','life-threatening','local','long-range','low-grade','ludicrous','maddening','malignant ',
+  'mild','morbid','mundane','nervous','non-specific','opportunistic','oppressive','parasitic','pathological',
+  'penetrative','synthetic','permanent','persistant','physical','preemptive','preparatory','preternatural',
+  'prickly','private','protective','providential','pseudo','psychosomatic','public','quiescent','quixotic',
+  'reflexive','refractory','regulatory','retroactive','revelatory','ritualistic','sacrificial','self-induced',
+  'self-inflicted','severe','spiritual','spontaneous','sporadic','strangulated','stubborn','surplus','systemic',
+  'terminal','theoretical','therapeutic','transformative','transient','traumatic','triggered','unresponsive',
+  'unsightly','Vancian','widespread'];
+
+const POWERM_PREFIX = ['acantho','aero','agro','amo','amphi','andro','angelo','antho','anthropo','arcano',
+  'arcto','argento','arithmo','arthro','aspido','astro','auro','auto','azo','biblio','bio','blasto','botano',
+  'bronto','carcino','cardio','carto','chemo','chrono','cinema','cosmo','cranio','cryo','crypto','crystallo',
+  'cubo','cupro','cyber','cyno','demo','demono','dendro','dermo','drama','electro','entomo','ergo','felido',
+  'ferro','flori','garbo','gastro','geo','gerento','glyco','grapho','gyno','gyro','hagio','hallucino',
+  'helico','helio','hemato','hippo','hydro','hypno','icthyo','info','kineto','lacto','litho','logo',
+  'macro','margarito','metal','meteoro','micro','mnemo','morpho','musico','myco','myo','necro','neo',
+  'nephro','neuro','numero','oculo','odonto','oneiro','oo','ophio','ornitho','osteo','oxy','paleo','pan',
+  'philio','ero','phono','photo','phyto','plumbo','pseudo','psycho','ptero','pyro','retro','rhino',
+  'rumpo','sarco','scato','seleno','smilo','sopho','spatula','spodo','spongo','techno','tele','tempesto',
+  'thalasso','thaumato','therio','thermo','thylaco','titano','toxico','veloci','vexillo','vitreo','vulcano',
+  'wumbo','xeno','xylo','zoo','zymo'];
+
+const POWER_SUFFIX = ['accumulation','acoustics','affinity','alteration','animacy','anthropy','aspis','banishment',
+  'barriers','beams','bending','biology','blasting','business','centrism','cide','clasm','claws','cognition',
+  'communication','core','cracy','craft','dactyly','dermis','detection','diffusion','embodiment','engineering',
+  'extraction','fication','form','furcation','gadgetry','gamy','genesis','grave','hazards','holism','illusions',
+  'immunity','imposition','injection','kinesis','lalia','leakage','lingualism','lithy','locomotion','logy',
+  'luminescence ','lurgy','lysis','machy','mageddon','magnetism','mancy','mastery','mechanisms','megaly','metry',
+  'mimicry','minions','morphy','nautics','necrosis','nium','nomy','pathy','phagy','phily','phobia','phoresis',
+  'plasty','plegia','poly','portals','portation','projection','ps','psychology','ptery','reflection','restoration',
+  'robbery','rrhagia','rrhea','sclerosis','scopy','sensation','sis','sophy','spasms','stalsis','stasis','staxis',
+  'stomy','synthesis','technics','therapy','tomy','toxicity','transfer','transit','trophy','vision','voyance','warding'];
+
 const EXPLANATIONS = {
   'OVDT': {
     name: 'Only Villains Do That',
