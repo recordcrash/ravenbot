@@ -8,7 +8,7 @@
 
 const {
   SCOPES, TOKEN_PATH, BANNED_CHANNEL_IDS, WORDS_SPREADSHEET, WOG_SPREADSHEET, POWERS,
-  POWER_MODIFIERS, EXPLANATIONS
+  POWER_MODIFIERS, EXPLANATIONS, POWERM_ADJECTIVE, POWERM_PREFIX, POWERM_SUFFIX
 } = require('./config/constants.js');
 
 const Discord = require('discord.js');
@@ -35,6 +35,15 @@ function generatePower() {
   sentence += ' ';
   sentence += POWER_MODIFIERS[Math.floor(Math.random() * POWER_MODIFIERS.length)];
   sentence += '.';
+  return sentence;
+}
+
+function generatePowerm() {
+  let sentence = '';
+  sentence += POWERM_ADJECTIVE[Math.floor(Math.random() * POWERM_ADJECTIVE.length)];
+  sentence += ' ';
+  sentence += POWERM_PREFIX[Math.floor(Math.random() * POWERM_PREFIX.length)];
+  sentence += POWERM_SUFFIX[Math.floor(Math.random() * POWERM_SUFFIX.length)];
   return sentence;
 }
 
