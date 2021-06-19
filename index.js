@@ -495,6 +495,22 @@ client.on('message', async (message) => {
     message.channel.send(powerEmbed);
   }
 
+  if (command === 'powerm') {
+    if (message.member) {
+      console.log(
+        `${message.member.user.tag
+        }(${
+          message.member.user
+        }) used command +powerm.`,
+      );
+    } else console.log('Someone used command +powerm.');
+    const powermEmbed = new Discord.MessageEmbed()
+      .setColor('#A4DACC')
+      .setAuthor('Alexander Wales', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
+      .setDescription(generatePowerm());
+    message.channel.send(powermEmbed);
+  }
+
   if (
     command === 'progress'
     || command === 'p'
