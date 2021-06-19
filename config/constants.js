@@ -73,7 +73,7 @@ const POWERM_PREFIX = ['acantho','aero','agro','amo','amphi','andro','angelo','a
   'thalasso','thaumato','therio','thermo','thylaco','titano','toxico','veloci','vexillo','vitreo','vulcano',
   'wumbo','xeno','xylo','zoo','zymo'];
 
-const POWER_SUFFIX = ['accumulation','acoustics','affinity','alteration','animacy','anthropy','aspis','banishment',
+const POWERM_SUFFIX = ['accumulation','acoustics','affinity','alteration','animacy','anthropy','aspis','banishment',
   'barriers','beams','bending','biology','blasting','business','centrism','cide','clasm','claws','cognition',
   'communication','core','cracy','craft','dactyly','dermis','detection','diffusion','embodiment','engineering',
   'extraction','fication','form','furcation','gadgetry','gamy','genesis','grave','hazards','holism','illusions',
