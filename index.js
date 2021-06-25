@@ -8,7 +8,7 @@
 
 const {
   SCOPES, TOKEN_PATH, BANNED_CHANNEL_IDS, WORDS_SPREADSHEET, WOG_SPREADSHEET, POWERS,
-  POWER_MODIFIERS, EXPLANATIONS
+  POWER_MODIFIERS, EXPLANATIONS, POWERM_ADJECTIVE, POWERM_PREFIX, POWERM_SUFFIX
 } = require('./config/constants.js');
 
 const Discord = require('discord.js');
@@ -30,6 +30,21 @@ function generatePower() {
   const butand = ['but', 'and'];
   let sentence = '';
   sentence += POWERS[Math.floor(Math.random() * POWERS.length)];
+  sentence += '. Yes, ';
+  sentence += butand[Math.floor(Math.random() * butand.length)];
+  sentence += ' ';
+  sentence += POWER_MODIFIERS[Math.floor(Math.random() * POWER_MODIFIERS.length)];
+  sentence += '.';
+  return sentence;
+}
+
+function generatePowerm() {
+  const butand = ['but', 'and'];
+  let sentence = '';
+  sentence += POWERM_ADJECTIVE[Math.floor(Math.random() * POWERM_ADJECTIVE.length)];
+  sentence += ' ';
+  sentence += POWERM_PREFIX[Math.floor(Math.random() * POWERM_PREFIX.length)];
+  sentence += POWERM_SUFFIX[Math.floor(Math.random() * POWERM_SUFFIX.length)];
   sentence += '. Yes, ';
   sentence += butand[Math.floor(Math.random() * butand.length)];
   sentence += ' ';
@@ -486,6 +501,22 @@ client.on('message', async (message) => {
       .setAuthor('Alexander Wales', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
       .setDescription(generatePower());
     message.channel.send(powerEmbed);
+  }
+
+  if (command === 'powerm') {
+    if (message.member) {
+      console.log(
+        `${message.member.user.tag
+        }(${
+          message.member.user
+        }) used command +powerm.`,
+      );
+    } else console.log('Someone used command +powerm.');
+    const powermEmbed = new Discord.MessageEmbed()
+      .setColor('#A4DACC')
+      .setAuthor('Alexamder Walesm', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
+      .setDescription(generatePowerm());
+    message.channel.send(powermEmbed);
   }
 
   if (
