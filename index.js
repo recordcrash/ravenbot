@@ -226,6 +226,7 @@ client.on('message', async (message) => {
           if (message.member) {
             const totaldata = rows.map((value) => value[8]);
             const grandTotal = totaldata[metadataRow];
+            console.log(`Grand total is: ${grandTotal}`)
 
             if (storage.getItemSync('grandtotal') !== grandTotal) {
               const dateOb = new Date();
@@ -366,8 +367,9 @@ client.on('message', async (message) => {
 
             message.channel.send(progressEmbed).then((sent) => {
               // React if numbers went up
-              if (numbersUp) {
+              if (numbersUp === true) {
                 sent.react('758041474335113397');
+                numbersUp = false;
               }
             });
           }
