@@ -460,7 +460,7 @@ client.on('message', async (message) => {
           value:
             'Adds the role Rationally Writing to the user, in order to be reminded of new AW podcast releases. Use again to remove.',
         },
-        { name: '+power', value: 'Outputs a random Alexander Walesque superpower with a drawback.' },
+        { name: '+power', value: 'Outputs a random Alexander Walesque superpower with a drawback. +powerm is an alternate version by Bacontime which generates more obtuse powers.' },
         {
           name: '+testsearch <search term>',
           value:
