@@ -461,7 +461,7 @@ client.on('message', async (message) => {
         {
           name: '+flower',
           value:
-            'Adds the role ´flower´ to the user, in order to receive warnings that a new chapter has dropped in #flower. Use again to remove.',
+            'Adds the role ´Flower´ to the user, in order to receive warnings that a new chapter has dropped in #flower. Use again to remove.',
         },
         { name: '+power', value: 'Outputs a random Alexander Walesque superpower with a drawback. +powerm is an alternate version by Bacontime which generates more obtuse powers.' },
         {
@@ -640,12 +640,12 @@ client.on('message', async (message) => {
     || command === 'flower'
   ) {
 	if (command === 'podcast') {
-		rolename = 'Rationally Writing'
-		addmsg = '`${rolename}` role added successfully. Listen to the podcast at <http://daystareld.com/podcasts/rationally-writing/>'
+		rolename = 'Rationally Writing';
+		addmsg = '`' + rolename + '` role added successfully. Listen to the podcast at <http://daystareld.com/podcasts/rationally-writing/>';
 	}
 	if (command === 'flower') {
-		rolename = 'flower'
-		addmsg = '`${rolename}` role added successfully. Read the story at <https://www.royalroad.com/fiction/28806> and discuss it in #flower.'
+		rolename = 'Flower';
+		addmsg = '`' + rolename + '` role added successfully. Read the story at <https://www.royalroad.com/fiction/28806> and discuss it in #flower.';
 	}
 	
     if (message.member) {
@@ -676,7 +676,7 @@ client.on('message', async (message) => {
           }) used command +${command} with the role`,
         );
         message.member.roles.remove(role);
-        message.channel.send('`${rolename}` role removed successfully.');
+        message.channel.send('`' + rolename + '` role removed successfully.');
       }
     } else {
       message.channel.send(
