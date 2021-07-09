@@ -635,78 +635,48 @@ client.on('message', async (message) => {
     }
   }
 
-  if (command === 'podcast') {
+  if (
+    command === 'podcast'
+    || command === 'flower'
+  ) {
+	if (command === 'podcast') {
+		rolename = 'Rationally Writing'
+		addmsg = '`${rolename}` role added successfully. Listen to the podcast at <http://daystareld.com/podcasts/rationally-writing/>'
+	}
+	if (command === 'flower') {
+		rolename = 'flower'
+		addmsg = '`${rolename}` role added successfully. Read the story at <https://www.royalroad.com/fiction/28806> and discuss it in #flower.'
+	}
+	
     if (message.member) {
       if (
         !message.member.roles.cache.some(
-          (role) => role.name === 'Rationally Writing',
+          (role) => role.name === rolename,
         )
       ) {
         console.log(
           `${message.member.user.tag
           }(${
             message.member.user
-          }) used command +podcast without the role`,
+          }) used command +${command} without the role`,
         );
         const role = message.guild.roles.cache.find(
-          (rol) => rol.name === 'Rationally Writing',
+          (rol) => rol.name === rolename,
         );
         message.member.roles.add(role);
-        message.channel.send(
-          'Rationally Writing role added successfully. Listen to the podcast at <http://daystareld.com/podcasts/rationally-writing/>',
-        );
+        message.channel.send(addmsg);
       } else {
         const role = message.guild.roles.cache.find(
-          (rol) => rol.name === 'Rationally Writing',
+          (rol) => rol.name === rolename,
         );
         console.log(
           `${message.member.user.tag
           }(${
             message.member.user
-          }) used command +podcast with the role`,
+          }) used command +${command} with the role`,
         );
         message.member.roles.remove(role);
-        message.channel.send('Rationally Writing role removed successfully.');
-      }
-    } else {
-      message.channel.send(
-        'You need more Degrees of Reasonableness in order to use this command in a Direct Message.',
-      );
-    }
-  }
-  
-  if (command === 'flower') {
-    if (message.member) {
-      if (
-        !message.member.roles.cache.some(
-          (role) => role.name === 'flower',
-        )
-      ) {
-        console.log(
-          `${message.member.user.tag
-          }(${
-            message.member.user
-          }) used command +flower without the role`,
-        );
-        const role = message.guild.roles.cache.find(
-          (rol) => rol.name === 'flower',
-        );
-        message.member.roles.add(role);
-        message.channel.send(
-          '`flower` role added successfully.',
-        );
-      } else {
-        const role = message.guild.roles.cache.find(
-          (rol) => rol.name === 'flower',
-        );
-        console.log(
-          `${message.member.user.tag
-          }(${
-            message.member.user
-          }) used command +flower with the role`,
-        );
-        message.member.roles.remove(role);
-        message.channel.send('`flower` role removed successfully.');
+        message.channel.send('`${rolename}` role removed successfully.');
       }
     } else {
       message.channel.send(
