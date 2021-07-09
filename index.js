@@ -458,6 +458,11 @@ client.on('message', async (message) => {
           value:
             'Adds the role Rationally Writing to the user, in order to be reminded of new AW podcast releases. Use again to remove.',
         },
+        {
+          name: '+flower',
+          value:
+            'Adds the role ´flower´ to the user, in order to receive warnings that a new chapter has dropped in #flower. Use again to remove.',
+        },
         { name: '+power', value: 'Outputs a random Alexander Walesque superpower with a drawback. +powerm is an alternate version by Bacontime which generates more obtuse powers.' },
         {
           name: '+testsearch <search term>',
@@ -662,6 +667,46 @@ client.on('message', async (message) => {
         );
         message.member.roles.remove(role);
         message.channel.send('Rationally Writing role removed successfully.');
+      }
+    } else {
+      message.channel.send(
+        'You need more Degrees of Reasonableness in order to use this command in a Direct Message.',
+      );
+    }
+  }
+  
+  if (command === 'flower') {
+    if (message.member) {
+      if (
+        !message.member.roles.cache.some(
+          (role) => role.name === 'flower',
+        )
+      ) {
+        console.log(
+          `${message.member.user.tag
+          }(${
+            message.member.user
+          }) used command +flower without the role`,
+        );
+        const role = message.guild.roles.cache.find(
+          (rol) => rol.name === 'flower',
+        );
+        message.member.roles.add(role);
+        message.channel.send(
+          '`flower` role added successfully.',
+        );
+      } else {
+        const role = message.guild.roles.cache.find(
+          (rol) => rol.name === 'flower',
+        );
+        console.log(
+          `${message.member.user.tag
+          }(${
+            message.member.user
+          }) used command +flower with the role`,
+        );
+        message.member.roles.remove(role);
+        message.channel.send('`flower` role removed successfully.');
       }
     } else {
       message.channel.send(
