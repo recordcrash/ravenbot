@@ -76,7 +76,7 @@ const POWERM_ADJECTIVE = POWER_MODIFIERS.concat(['abnormal','accidental','acute'
   'self-inflicted','severe','spiritual','spontaneous','sporadic','strangulated','stubborn','surplus','systemic',
   'terminal','theoretical','therapeutic','transformative','transient','traumatic','triggered','unresponsive',
   'unsightly','vancian','widespread','tactile','social','sympathetic','interpretive','representative','totalitarian',
-  'meta, like really meta','acausal',]);
+  'meta, like really meta','acausal','Walter',]);
 
 const POWERM_PREFIX = ['Acantho','Aero','Agro','Amo','Amphi','Andro','Angelo','Antho','Anthropo','Arcano',
   'Arcto','Argento','Arithmo','Arthro','Aspido','Astro','Auro','Auto','Azo','Biblio','Bio','Blasto','Botano',
@@ -91,7 +91,7 @@ const POWERM_PREFIX = ['Acantho','Aero','Agro','Amo','Amphi','Andro','Angelo','A
   'Thalasso','Thaumato','Therio','Thermo','Thylaco','Titano','Toxico','Veloci','Vexillo','Vitreo','Vulcano',
   'Wumbo','Xeno','Xylo','Zoo','Zymo','Caprido','Malaco','Genio','Kratero','Krita','Merito','Neto','Noo',
   'Strato','Theo','Timo','Coporato','Kakisto','Klepto','Nepoto','Iso','Gamo','Geriatro','Banana',
-  'Lepido','Melitto','Myrmeco','Herpeto','Nemato','Plankto',];
+  'Lepido','Melitto','Myrmeco','Herpeto','Nemato','Plankto','Walter',];
 
 const POWERM_SUFFIX = ['accumulation','acoustics','affinity','alteration','animacy','anthropy','aspis','banishment',
   'barriers','beams','bending','biology','blasting','business','centrism','cide','clasm','claws','cognition',
@@ -102,7 +102,7 @@ const POWERM_SUFFIX = ['accumulation','acoustics','affinity','alteration','anima
   'mimicry','minions','morphy','nautics','necrosis','nium','nomy','pathy','phagy','phily','phobia','phoresis',
   'plasty','plegia','poly','portals','portation','projection','ps','psychology','ptery','reflection','restoration',
   'robbery','rrhagia','rrhea','sclerosis','scopy','sensation','sis','sophy','spasms','stalsis','stasis','staxis',
-  'stomy','synthesis','technics','therapy','tomy','toxicity','transfer','transit','trophy','vision','voyance','warding'];
+  'stomy','synthesis','technics','therapy','tomy','toxicity','transfer','transit','trophy','vision','voyance','warding','-Walter',];
 
 const EXPLANATIONS = {
   'OVDT': {
