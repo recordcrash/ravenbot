@@ -6,19 +6,19 @@
 // Modified version of Federico Grandi's cron solution to time checking in https://stackoverflow.com/a/53822507
 // Everything else by Makin
 
-const {
-  SCOPES, TOKEN_PATH, BANNED_CHANNEL_IDS, WORDS_SPREADSHEET, WOG_SPREADSHEET, POWERS,
-  POWER_MODIFIERS, EXPLANATIONS, POWERM_ADJECTIVE, POWERM_PREFIX, POWERM_SUFFIX
-} = require('./config/constants.js');
-
 const Discord = require('discord.js');
-const fs = require('fs');
-const readline = require('readline');
-const { google } = require('googleapis');
 const cron = require('cron');
 const http = require('http');
 const TurndownService = require('turndown');
 const storage = require('node-persist');
+const fs = require('fs');
+const { google } = require('googleapis');
+const {
+  BANNED_CHANNEL_IDS, WORDS_SPREADSHEET, WOG_SPREADSHEET, POWERS,
+  POWER_MODIFIERS, EXPLANATIONS, POWERM_ADJECTIVE, POWERM_PREFIX, POWERM_SUFFIX,
+} = require('./config/constants');
+const { authorize } = require('./config/google');
+const { getProgressFromSheet } = require('./commands/sheetCommands');
 
 // eslint-disable-next-line no-var
 var numbersUp = false;
@@ -90,62 +90,6 @@ const grep = function (what, where, callback) {
   );
 };
 
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
- */
-function getNewToken(oAuth2Client, callback) {
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-  });
-  console.log('Authorize this app by visiting this url:', authUrl);
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  rl.question('Enter the code from that page here: ', (code) => {
-    rl.close();
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err) {
-        return console.error(
-          'Error while trying to retrieve access token',
-          err,
-        );
-      }
-      oAuth2Client.setCredentials(token);
-      // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (writeError) => {
-        if (writeError) return console.error(writeError);
-        console.log('Token stored to', TOKEN_PATH);
-        return true;
-      });
-      callback(oAuth2Client);
-      return true;
-    });
-  });
-}
-
-function authorize(credentials, callback) {
-  // eslint-disable-next-line camelcase
-  const { client_secret, client_id, redirect_uris } = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(
-    client_id,
-    client_secret,
-    redirect_uris[0],
-  );
-
-  // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) return getNewToken(oAuth2Client, callback);
-    oAuth2Client.setCredentials(JSON.parse(token));
-    callback(oAuth2Client);
-    return true;
-  });
-}
-
 // starting turndown to turn HTML output into markdown for Discord
 const turndownService = new TurndownService({
   headingstyle: 'atx',
@@ -182,7 +126,6 @@ client.on('guildDelete', (guild) => {
   client.user.setActivity('exposition fairy');
 });
 
-
 client.on('message', async (message) => {
   if (BANNED_CHANNEL_IDS.includes(message.channel.id)) return;
   if (message.author.bot) return;
@@ -191,6 +134,47 @@ client.on('message', async (message) => {
 
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
+
+  function storyOver() {
+    const exampleEmbed = new Discord.MessageEmbed()
+      .setColor('#E5D2A0')
+      .setTitle('Final Stats')
+      .setDescription(
+        'Rest in dice, \n\n**Worth the Candle, by Alexander Wales**\n**July 14th, 2017 - July 17th, 2021**.\n\nA list of non-canonical [apocrypha](https://www.reddit.com/r/alexanderwales/comments/oor4r7/worth_the_candle_apocrypha/) and a [post-mortem](https://www.reddit.com/r/alexanderwales/comments/onf72r/post_mortem_worth_the_candle/) are now available. '
+        + '\n\nA few epilogues are coming Monday 2nd, Wednesday 4th and Friday 6th for early birds (24 hours after for normies), followed by an AMA on /r/alexanderwales.\n\nThe next story, *This Used to be About Dungeons*, a slice-of-life tale of friendship and adventure, will release soon after.',
+      )
+      .setURL(
+        'https://docs.google.com/spreadsheets/d/1PaLrwVYgxp_SYHtkred7ybpSJPHL88lf4zB0zMKmk1E',
+      )
+      .setAuthor(
+        'Worth the Candle',
+        'https://i.imgur.com/qyPZoAw.png',
+        'https://www.royalroad.com/fiction/25137/worth-the-candle',
+      )
+      .addFields(
+        {
+          name: 'Epilogue List',
+          value: 'Epilogue 1: 9181 words\nEpilogue 2: 5956 words\nEpilogue 3: 7894 words\nEpilogue 4: 3117 words\nEpilogue 5: 3263 words\nEpilogue 6: 3586 words\nEpilogue 7: 4297 words\nEpilogue 8: 5245 words\n',
+          inline: false,
+        },
+        {
+          name: 'Structural stats',
+          value: '9 books, 246 chapters, 3+ bonus stories',
+          inline: true,
+        },
+        {
+          name: 'Length stats',
+          value: '1,652,778 words, ~1,100/day',
+          inline: true,
+        },
+        {
+          name: 'Community stats',
+          value: '~385,000 Discord messages, 1,792 members, 510 patrons, and many reddit stats I\'m too lazy to track. And YOU— wait that doesn\'t make sense in this context...',
+          inline: false,
+        },
+      );
+    message.channel.send(exampleEmbed);
+  }
 
   function listProgress(auth) {
     const sheets = google.sheets({ version: 'v4', auth });
@@ -204,192 +188,7 @@ client.on('message', async (message) => {
           message.channel.send(`Error contacting the Discord API: ${err}`);
           return console.log(`The API returned an error: ${err}`);
         }
-        const rows = res.data.values;
-        if (rows.length) {
-          let batchRow = 0;
-          let chapterRow = 0;
-          let metadataRow = 0;
-          const batches = rows.map((value) => value[1]);
-          for (let i = batches.length - 1; i > 0; i -= 1) {
-            if (batches[i]) {
-              batchRow = i;
-              break;
-            }
-          }
-          const chapters = rows.map((value) => value[0]);
-          for (let j = chapters.length - 1; j > 0; j -= 1) {
-            if (chapters[j]) {
-              chapterRow = j;
-              break;
-            }
-          }
-
-          const metadata = rows.map((value) => value[5]);
-          for (let k = metadata.length - 1; k > 0; k -= 1) {
-            if (metadata[k] && metadata[k] > 0) {
-              metadataRow = k;
-              break;
-            }
-          }
-
-          const wordsPer = metadata[metadataRow];
-          const totalWords = metadata[metadataRow - 1];
-          const daysSince = metadata[metadataRow - 2];
-
-          if (message.member) {
-            const totaldata = rows.map((value) => value[8]);
-            const grandTotal = totaldata[metadataRow];
-            console.log(`Grand total is: ${grandTotal}`)
-
-            if (storage.getItemSync('grandtotal') !== grandTotal) {
-              const dateOb = new Date();
-              const date = (`0${dateOb.getDate()}`).slice(-2);
-              const month = (`0${dateOb.getMonth() + 1}`).slice(-2);
-              const year = dateOb.getFullYear();
-              const hours = (`0${dateOb.getHours()}`).slice(-2);
-              const minutes = (`0${dateOb.getMinutes()}`).slice(-2);
-              const seconds = (`0${dateOb.getSeconds()}`).slice(-2);
-              const finalDate = `${hours}:${minutes}:${seconds} ${month}/${date}/${year}`;
-              storage.setItemSync('updateDate', finalDate);
-              console.log(`Sheet updated: update date: ${finalDate}`);
-            }
-            if (storage.getItemSync('grandtotal') < grandTotal) {
-              numbersUp = true;
-              console.log(`Numbers went up! New grand total: ${grandTotal}`);
-            }
-            // We store the grand total in case numbers actually went down
-            storage.setItemSync('grandtotal', grandTotal);
-          }
-
-          // Format fucked for some reason, only if AW puts something in the date
-          // field where he shouldn't
-          if (chapterRow - batchRow < 0) {
-            message.channel.send(
-              'Error fetching chapters from the spreadsheet (Wrong format?).',
-            );
-            // Special case: batch ready and upcoming, or already out with no progress
-          } else if (chapterRow - batchRow === 0) {
-            let specialRow = 0;
-            for (let l = batchRow - 1; l > 0; l -= 1) {
-              if (batches[l]) {
-                specialRow = l;
-                break;
-              }
-            }
-            const newdate = batchRow;
-            batchRow = specialRow;
-            let chapterList = '';
-
-            rows.slice(batchRow + 1, chapterRow + 1).forEach((row) => {
-              if (row[3]) {
-                chapterList
-                  += `Chapter ${row[0]}: ${row[2]} words (${row[3]})\n`;
-              } else chapterList += `Chapter ${row[0]}: ${row[2]} words\n`;
-            });
-
-            const exampleEmbed = new Discord.MessageEmbed()
-              .setColor('#E5D2A0')
-              .setTitle('Finished batch information')
-              .setDescription(
-                `Available for the Early Birds Patreon tier **${
-                  batches[newdate]
-                }**.\nNon-patrons will get the chapters one day later.`,
-              )
-              .setURL(
-                'https://docs.google.com/spreadsheets/d/1PaLrwVYgxp_SYHtkred7ybpSJPHL88lf4zB0zMKmk1E',
-              )
-              .setAuthor(
-                'Worth the Candle',
-                'https://i.imgur.com/qyPZoAw.png',
-                'https://www.royalroad.com/fiction/25137/worth-the-candle',
-              )
-              .addFields(
-                { name: 'Chapter list', value: chapterList },
-                {
-                  name: 'Batch stats',
-                  value: `${totalWords} words, ${wordsPer}/day`,
-                  inline: true,
-                },
-              );
-            message.channel.send(exampleEmbed);
-            // End of special case, I hate myself for this hackery
-          } else {
-            let chapterList = '';
-            rows.slice(batchRow + 1, chapterRow + 1).forEach((row) => {
-              if (row[3]) {
-                chapterList
-                  += `Chapter ${row[0]}: ${row[2] || 0} words (${row[3]})\n`;
-              } else chapterList += `Chapter ${row[0]}: ${row[2]} words\n`;
-            });
-
-            const progressEmbed = new Discord.MessageEmbed()
-              .setColor('#E5D2A0')
-              .setTitle('Upcoming chapter progress')
-              .setURL(
-                'https://docs.google.com/spreadsheets/d/1PaLrwVYgxp_SYHtkred7ybpSJPHL88lf4zB0zMKmk1E',
-              )
-              .setAuthor(
-                'Worth the Candle',
-                'https://i.imgur.com/qyPZoAw.png',
-                'https://www.royalroad.com/fiction/25137/worth-the-candle',
-              )
-              .addFields(
-                { name: 'Chapter list', value: chapterList },
-                {
-                  name: 'Last batch',
-                  value: `${batches[batchRow]} (${daysSince} days ago)`,
-                  inline: true,
-                },
-                {
-                  name: 'Upcoming batch stats',
-                  value: `${totalWords} words, ${wordsPer}/day`,
-                  inline: true,
-                },
-                {
-                  name: 'Last sheet update',
-                  value: storage.getItemSync('updateDate') || 'No value yet!',
-                  inline: true,
-                },
-              );
-            if (command === 'pogress' || command === 'pog') {
-              progressEmbed
-                .setTitle('Upcoming chapter pogress')
-                .setAuthor(
-                  'Worth the Candle',
-                  'https://i.imgur.com/Sikw7S2.png',
-                  'https://www.royalroad.com/fiction/25137/worth-the-candle',
-                );
-            }
-            if (command === 'regress') {
-              progressEmbed.fields = [];
-              progressEmbed.addFields(
-                { name: 'Chapter list', value: 'Chapter 1: 0 words' },
-                {
-                  name: 'Last batch',
-                  value: `January 1st (${9999} days ago)`,
-                  inline: true,
-                },
-                {
-                  name: 'Upcoming batch stats',
-                  value: `${0} words, ${0}/day`,
-                  inline: true,
-                },
-              );
-              progressEmbed.setTitle('Upcoming chapter "progress"');
-            }
-
-            message.channel.send(progressEmbed).then((sent) => {
-              // React if numbers went up
-              if (numbersUp === true) {
-                sent.react('758041474335113397');
-                numbersUp = false;
-              }
-            });
-          }
-        } else {
-          console.log('No data found.');
-          message.channel.send('Error contacting the server.');
-        }
+        getProgressFromSheet(res, message, storage, numbersUp, command);
         return true;
       },
     );
@@ -549,6 +348,18 @@ client.on('message', async (message) => {
         }.`,
       );
     }
+
+    storyOver();
+
+    // fs.readFile('./config/credentials.json', (err, content) => {
+    //   if (err) return console.log('Error loading client secret file:', err);
+    // Authorize a client with credentials, then call the Google Sheets API.
+    //   authorize(JSON.parse(content), listProgress);
+    //   return true;
+    // });
+  }
+
+  if (command === 'asdf') {
     fs.readFile('./config/credentials.json', (err, content) => {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Sheets API.
@@ -604,12 +415,6 @@ client.on('message', async (message) => {
     });
   }
 
-  if (command === 'transgress') {
-    message.channel.send({
-      files: ['./images/transgress.jpg'],
-    });
-  }
-
   if (command === 'logress') {
     if (message.member) {
       message.channel.send(
@@ -639,15 +444,17 @@ client.on('message', async (message) => {
     command === 'podcast'
     || command === 'flower'
   ) {
-	if (command === 'podcast') {
-		rolename = 'Rationally Writing';
-		addmsg = '`' + rolename + '` role added successfully. Listen to the podcast at <http://daystareld.com/podcasts/rationally-writing/>';
-	}
-	if (command === 'flower') {
-		rolename = 'Flower';
-		addmsg = '`' + rolename + '` role added successfully. Read the story at <https://www.royalroad.com/fiction/28806> and discuss it in #flower.';
-	}
-	
+    let rolename = 'Role name';
+    let addmsg = `\`${rolename}\` role added successfully.`;
+    if (command === 'podcast') {
+      rolename = 'Rationally Writing';
+      addmsg = `\`${rolename}\` role added successfully. Listen to the podcast at <http://daystareld.com/podcasts/rationally-writing/>`;
+    }
+    if (command === 'flower') {
+      rolename = 'Flower';
+      addmsg = `\`${rolename}\` role added successfully. Read the story at <https://www.royalroad.com/fiction/28806> and discuss it in #flower.`;
+    }
+
     if (message.member) {
       if (
         !message.member.roles.cache.some(
@@ -676,7 +483,7 @@ client.on('message', async (message) => {
           }) used command +${command} with the role`,
         );
         message.member.roles.remove(role);
-        message.channel.send('`' + rolename + '` role removed successfully.');
+        message.channel.send(`\`${rolename}\` role removed successfully.`);
       }
     } else {
       message.channel.send(
@@ -684,7 +491,7 @@ client.on('message', async (message) => {
       );
     }
   }
-  
+
   if (command === 'explain' || command === 'e') {
     const explained = args.join(' ');
     if (message.member) {
@@ -692,24 +499,23 @@ client.on('message', async (message) => {
         `${message.member.user.tag
         }(${
           message.member.user
-        }) used command +explain and asked for '${ explained }'.`,
+        }) used command +explain and asked for '${explained}'.`,
       );
     } else {
-      console.log( `Someone used command +explain and searched '${explained}'.`);
+      console.log(`Someone used command +explain and searched '${explained}'.`);
     }
-    if (explained.toUpperCase() === 'ALL' || explained === '*' || explained === ''){
+    if (explained.toUpperCase() === 'ALL' || explained === '*' || explained === '') {
       message.channel.send(
-        `The full list of works available to this command is located at <https://discord.com/channels/437695037401464851/437697099383963668/848202602688282655>.`,
+        'The full list of works available to this command is located at <https://discord.com/channels/437695037401464851/437697099383963668/848202602688282655>.',
       );
-    }
-    else if (explained.toUpperCase() in EXPLANATIONS) {
+    } else if (explained.toUpperCase() in EXPLANATIONS) {
       const story = EXPLANATIONS[explained.toUpperCase()];
       message.channel.send(
         `I've found something called ***${story.name}***. Is this what you were looking for? ${story.link}`,
       );
     } else {
       message.channel.send(
-        `I can't find that story among my 32768 books.`,
+        'I can\'t find that story among my 32768 books.',
       );
     }
   }
