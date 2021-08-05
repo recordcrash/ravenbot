@@ -1,26 +1,14 @@
 const Discord = require('discord.js');
-const util = require('util');
 const { Batch } = require('../classes/batch');
 const { IMAGE_URLS, PROGRESS_EMBED_COLOR } = require('../config/constants');
-
-function getCurrentDateString() {
-  const dateOb = new Date();
-  const date = (`0${dateOb.getDate()}`).slice(-2);
-  const month = (`0${dateOb.getMonth() + 1}`).slice(-2);
-  const year = dateOb.getFullYear();
-  const hours = (`0${dateOb.getHours()}`).slice(-2);
-  const minutes = (`0${dateOb.getMinutes()}`).slice(-2);
-  const seconds = (`0${dateOb.getSeconds()}`).slice(-2);
-  const finalDate = `${hours}:${minutes}:${seconds} ${month}/${date}/${year}`;
-  return finalDate;
-}
+const { getDateTimeString } = require('../helpers/dates');
 
 function handleGrandTotal(storage, message) {
   const { grandTotal } = Batch;
   console.log(`Grand total is: ${grandTotal}`);
 
   if (storage.getItemSync('grandtotal') !== grandTotal) {
-    const currentDate = getCurrentDateString();
+    const currentDate = getDateTimeString(new Date());
     storage.setItemSync('updateDate', currentDate);
     console.log(`Sheet updated: update date: ${currentDate}`);
   }

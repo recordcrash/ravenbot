@@ -1,3 +1,4 @@
+const { getDateString } = require('../helpers/dates');
 const { Chapter } = require('./chapter');
 
 const CHAPTER_COL = 0;
@@ -82,12 +83,13 @@ class Batch {
     if (Batch.globalStatus === Batch.FIRSTBATCH) return 'No previous batches found!';
     const daysBetween = Batch.daysBetween(Batch.lastUpdateDate(), new Date());
     const pluralString = (daysBetween === 1 || daysBetween === -1) ? '' : 's';
-    if (daysBetween > 0) return `**${Batch.lastUpdateDate()}** (${daysBetween} day${pluralString} ago)`;
-    return `**${Batch.lastUpdateDate()}** (${daysBetween * -1} day${pluralString} from now)`;
+    const dateString = getDateString(Batch.lastUpdateDate());
+    if (daysBetween > 0) return `**${dateString}** (${daysBetween} day${pluralString} ago)`;
+    return `**${dateString}** (${daysBetween * -1} day${pluralString} from now)`;
   }
 
   static getUpcomingBatchStats() {
-    return `${Batch.lastBatch().words} words, ${Batch.lastBatch().wordsPerDay.toPrecision(6)}/day`;
+    return `${Batch.lastBatch().words} words, ${Batch.lastBatch().wordsPerDay.toPrecision(5)}/day`;
   }
 
   static getChapterList() {
@@ -128,9 +130,9 @@ class Batch {
       case Batch.NORELEASE:
         return 'Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) at an unknown date.\nNon-patrons will get the chapters two days later.';
       case Batch.PRERELEASE:
-        return `Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) **${Batch.nextReleaseDate()}**.\nNon-patrons will get the chapters two days later.`;
+        return `Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) **${getDateString(Batch.nextReleaseDate())} CST**.\nNon-patrons will get the chapters two days later.`;
       case Batch.POSTRELEASE:
-        return `Last available batch released **${Batch.lastUpdateDate()}** for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales).\n`;
+        return `Last available batch released **${getDateString(Batch.lastUpdateDate())}** for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales).\n`;
       default:
         return 'You really shouldn\'t be able to see this';
     }

@@ -57,52 +57,11 @@ client.on('message', async (message) => {
     console.log(`Someone used command +${command} in channel ${message.channel.id}.`);
   }
 
-  function storyOver() {
-    const exampleEmbed = new Discord.MessageEmbed()
-      .setColor('#E5D2A0')
-      .setTitle('Final Stats')
-      .setDescription(
-        'Rest in dice, \n\n**Worth the Candle, by Alexander Wales**\n**July 14th, 2017 - July 17th, 2021**.\n\nA list of non-canonical [apocrypha](https://www.reddit.com/r/alexanderwales/comments/oor4r7/worth_the_candle_apocrypha/) and a [post-mortem](https://www.reddit.com/r/alexanderwales/comments/onf72r/post_mortem_worth_the_candle/) are now available. '
-        + '\n\nA few epilogues are coming Monday 2nd, Wednesday 4th and Friday 6th for early birds (24 hours after for normies), followed by an AMA on /r/alexanderwales.\n\nThe next story, *This Used to be About Dungeons*, a slice-of-life tale of friendship and adventure, will release soon after.',
-      )
-      .setURL(
-        'https://docs.google.com/spreadsheets/d/1PaLrwVYgxp_SYHtkred7ybpSJPHL88lf4zB0zMKmk1E',
-      )
-      .setAuthor(
-        'Worth the Candle',
-        'https://i.imgur.com/qyPZoAw.png',
-        'https://www.royalroad.com/fiction/25137/worth-the-candle',
-      )
-      .addFields(
-        {
-          name: 'Epilogue List',
-          value: 'Epilogue 1: 9181 words\nEpilogue 2: 5956 words\nEpilogue 3: 7894 words\nEpilogue 4: 3117 words\nEpilogue 5: 3263 words\nEpilogue 6: 3586 words\nEpilogue 7: 4297 words\nEpilogue 8: 5245 words\n',
-          inline: false,
-        },
-        {
-          name: 'Structural stats',
-          value: '9 books, 246 chapters, 3+ bonus stories',
-          inline: true,
-        },
-        {
-          name: 'Length stats',
-          value: '1,652,778 words, ~1,100/day',
-          inline: true,
-        },
-        {
-          name: 'Community stats',
-          value: '~385,000 Discord messages, 1,792 members, 510 patrons, and many reddit stats I\'m too lazy to track. And YOU— wait that doesn\'t make sense in this context...',
-          inline: false,
-        },
-      );
-    message.channel.send(exampleEmbed);
-  }
-
   function listProgress(auth) {
     const sheets = google.sheets({ version: 'v4', auth });
     sheets.spreadsheets.values.get(
       {
-        spreadsheetId: DUNGEONS_SPREADSHEET,
+        spreadsheetId: TEST_SPREADSHEET,
         range: 'A2:I',
       },
       (err, res) => {
@@ -250,12 +209,6 @@ client.on('message', async (message) => {
           (role) => role.name === rolename,
         )
       ) {
-        console.log(
-          `${message.member.user.tag
-          }(${
-            message.member.user
-          }) used command +${command} without the role`,
-        );
         const role = message.guild.roles.cache.find(
           (rol) => rol.name === rolename,
         );
@@ -264,12 +217,6 @@ client.on('message', async (message) => {
       } else {
         const role = message.guild.roles.cache.find(
           (rol) => rol.name === rolename,
-        );
-        console.log(
-          `${message.member.user.tag
-          }(${
-            message.member.user
-          }) used command +${command} with the role`,
         );
         message.member.roles.remove(role);
         message.channel.send(`\`${rolename}\` role removed successfully.`);
