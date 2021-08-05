@@ -148,14 +148,13 @@ class Batch {
     const batchStatus = Batch.globalStatus;
     if (Batch.getChapterList()) fields.push(chapterListField);
     if (batchStatus !== Batch.FIRSTBATCH) fields.push(lastBatchField);
-    if (batchStatus !== Batch.POSTRELEASE) {
-      fields.push(upcomingBatchStatsField);
-    }
+    if (batchStatus !== Batch.POSTRELEASE) fields.push(upcomingBatchStatsField);
     if (Batch.updateDateString) fields.push(lastSheetUpdateField);
     return fields;
   }
 
   static initializeBatchManager(sheetRows, updateDateString) {
+    Batch.batches.length = 0;
     Batch.updateDateString = updateDateString;
     const chapters = [];
 
