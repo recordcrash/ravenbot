@@ -62,12 +62,11 @@ class Batch {
         lastDate = batch.releaseDate;
       }
     });
-    console.log(lastDate);
     return lastDate;
   }
 
   static nextReleaseDate() {
-    return Batch.lastBatch().releaseDate || 'Error, date not found. Contact Makin#0413';
+    return Batch.lastBatch().releaseDate || 'Never';
   }
 
   static daysBetween(date1, date2) {
@@ -88,7 +87,7 @@ class Batch {
   }
 
   static getUpcomingBatchStats() {
-    return `${Batch.lastBatch().words} words, ${Batch.lastBatch().wordsPerDay}/day`;
+    return `${Batch.lastBatch().words} words, ${Batch.lastBatch().wordsPerDay.toPrecision(6)}/day`;
   }
 
   static getChapterList() {
@@ -102,6 +101,9 @@ class Batch {
 
   static initializeGlobalStatus() {
     const today = new Date();
+    console.log(today);
+    console.log(Batch.batches);
+    console.log(Batch.batches.length);
     if (Batch.batches.length < 2) Batch.globalStatus = Batch.FIRSTBATCH;
     else if (!Batch.lastBatch().releaseDate) Batch.globalStatus = Batch.NORELEASE;
     else if (Batch.daysBetween(Batch.lastBatch().releaseDate, today) < 1) {
