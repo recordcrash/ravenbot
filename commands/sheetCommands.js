@@ -53,9 +53,8 @@ function getProgressFromSheet(res, message, storage) {
   const rows = res.data.values;
   if (rows.length) {
     const updateDateString = storage.getItemSync('updateDate') || 'No value yet!';
+
     Batch.initializeBatchManager(rows, updateDateString);
-    console.log(util.inspect(Batch.batches, false, null, true));
-    console.log(Batch.globalStatus);
 
     const embed = buildNextChapterEmbed();
 

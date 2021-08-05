@@ -101,9 +101,6 @@ class Batch {
 
   static initializeGlobalStatus() {
     const today = new Date();
-    console.log(today);
-    console.log(Batch.batches);
-    console.log(Batch.batches.length);
     if (Batch.batches.length < 2) Batch.globalStatus = Batch.FIRSTBATCH;
     else if (!Batch.lastBatch().releaseDate) Batch.globalStatus = Batch.NORELEASE;
     else if (Batch.daysBetween(Batch.lastBatch().releaseDate, today) < 1) {
