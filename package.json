@@ -1,6 +1,6 @@
 {
   "name": "RavenBot",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Retrieves a variety of data for the story 'Worth the Candle' by Alexander Wales.",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,10 @@
     "turndown": "^6.0.0"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.14.9",
+    "@babel/eslint-plugin": "^7.14.5",
+    "@babel/plugin-syntax-class-properties": "^7.12.13",
+    "@babel/preset-env": "^7.14.9",
     "eslint": "^7.28.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.23.4"

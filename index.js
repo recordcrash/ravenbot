@@ -1,102 +1,20 @@
-/* eslint-disable global-require */
-/* eslint-disable no-console */
 // **RavenBot Main Loop**
-// Credits:
-// Modified version of eslachance's "The Perfect Lil' Bot" https://gist.github.com/eslachance/3349734a98d30011bb202f47342601d3
-// Modified version of Federico Grandi's cron solution to time checking in https://stackoverflow.com/a/53822507
-// Everything else by Makin
 
 const Discord = require('discord.js');
-const cron = require('cron');
-const http = require('http');
-const TurndownService = require('turndown');
 const storage = require('node-persist');
 const fs = require('fs');
 const { google } = require('googleapis');
 const {
-  BANNED_CHANNEL_IDS, WORDS_SPREADSHEET, WOG_SPREADSHEET, POWERS,
-  POWER_MODIFIERS, EXPLANATIONS, POWERM_ADJECTIVE, POWERM_PREFIX, POWERM_SUFFIX,
+  BANNED_CHANNEL_IDS, WTC_SPREADSHEET, WOG_SPREADSHEET, EXPLANATIONS,
+  TEST_SPREADSHEET, DUNGEONS_SPREADSHEET,
 } = require('./config/constants');
 const { authorize } = require('./config/google');
 const { getProgressFromSheet } = require('./commands/sheetCommands');
-
-// eslint-disable-next-line no-var
-var numbersUp = false;
+const { generatePower, generatePowerm } = require('./commands/powerCommands');
+const { getHelpEmbed } = require('./commands/staticCommands');
 
 // Persistent storage for grand total
 storage.initSync();
-
-function generatePower() {
-  const butand = ['but', 'and'];
-  let sentence = '';
-  sentence += POWERS[Math.floor(Math.random() * POWERS.length)];
-  sentence += '. Yes, ';
-  sentence += butand[Math.floor(Math.random() * butand.length)];
-  sentence += ' ';
-  sentence += POWER_MODIFIERS[Math.floor(Math.random() * POWER_MODIFIERS.length)];
-  sentence += '.';
-  return sentence;
-}
-
-function generatePowerm() {
-  const butand = ['but', 'and'];
-  let sentence = '';
-  sentence += POWERM_PREFIX[Math.floor(Math.random() * POWERM_PREFIX.length)];
-  sentence += POWERM_SUFFIX[Math.floor(Math.random() * POWERM_SUFFIX.length)];
-  sentence += '. Yes, ';
-  sentence += butand[Math.floor(Math.random() * butand.length)];
-  sentence += ' ';
-  sentence += POWERM_ADJECTIVE[Math.floor(Math.random() * POWERM_ADJECTIVE.length)];
-  sentence += '.';
-  return sentence;
-}
-
-function downloadHTML() {
-  // This function downloads the entire story every day so you can search it
-  console.log('Attempting to download html');
-  const download = (url, dest, cb) => {
-    const file = fs.createWriteStream(dest);
-    http.get(url, (response) => {
-      response.pipe(file);
-      file.on('finish', () => {
-        console.log('HTML downloaded successfully');
-        file.close(cb);
-      });
-    }).on('error', (err) => {
-      // Handle errors
-      console.log(`Error downloading HTML file: ${err.message}`);
-      fs.unlink(dest);
-      if (cb) cb(err.message);
-    });
-  };
-
-  download(
-    'http://download.archiveofourown.org/downloads/11478249/Worth%20the%20Candle.html',
-    'files/wtc.html',
-  );
-}
-
-const downloadTask = new cron.CronJob('13 00 00 * * *', downloadHTML);
-
-// eslint-disable-next-line func-names
-const grep = function (what, where, callback) {
-  const { exec } = require('child_process');
-  exec(
-    `grep "${what.replace(/"/g, '\\"')}" ${where} -hiw -m 5`,
-    (err, stdin) => {
-      const results = stdin.split('\n').slice(0, 10);
-      callback(results);
-    },
-  );
-};
-
-// starting turndown to turn HTML output into markdown for Discord
-const turndownService = new TurndownService({
-  headingstyle: 'atx',
-  hr: '',
-  emDelimiter: '*',
-  fence: '',
-});
 
 const client = new Discord.Client();
 const config = require('./config/config.json');
@@ -105,8 +23,6 @@ client.on('ready', () => {
   console.log(
     `Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.`,
   );
-  // downloadHTML();
-  downloadTask.start();
   client.user.setActivity('exposition fairy');
   /* set avatar (only needs to be done once)
   client.user.setAvatar('./images/raven.jpg')
@@ -134,6 +50,12 @@ client.on('message', async (message) => {
 
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
+
+  if (message.member) {
+    console.log(`${message.member.user.tag}(${message.member.user}) used command +${command} in channel ${message.channel.id}.`);
+  } else {
+    console.log(`Someone used command +${command} in channel ${message.channel.id}.`);
+  }
 
   function storyOver() {
     const exampleEmbed = new Discord.MessageEmbed()
@@ -180,7 +102,7 @@ client.on('message', async (message) => {
     const sheets = google.sheets({ version: 'v4', auth });
     sheets.spreadsheets.values.get(
       {
-        spreadsheetId: WORDS_SPREADSHEET,
+        spreadsheetId: DUNGEONS_SPREADSHEET,
         range: 'A2:I',
       },
       (err, res) => {
@@ -188,7 +110,7 @@ client.on('message', async (message) => {
           message.channel.send(`Error contacting the Discord API: ${err}`);
           return console.log(`The API returned an error: ${err}`);
         }
-        getProgressFromSheet(res, message, storage, numbersUp, command);
+        getProgressFromSheet(res, message, storage, command);
         return true;
       },
     );
@@ -225,63 +147,11 @@ client.on('message', async (message) => {
   }
 
   if (command === 'help') {
-    if (message.member) {
-      console.log(
-        `${message.member.user.tag
-        }(${
-          message.member.user
-        }) used command +help.`,
-      );
-    } else console.log('Someone used command +help.');
-
-    const helpEmbed = new Discord.MessageEmbed()
-      .setColor('#000000')
-      .setAuthor('Help message', 'https://i.imgur.com/4Y8xKdY.png')
-      .setDescription(
-        'RavenBot is designed to cater to the needs of the Alexander Wales server and provide information about his creations. '
-          + "All commands can be sent via Direct Message if you don't want to spam the chat. "
-          + 'If you need help regarding its use or have any feature suggestions, contact **Makin#0413**.\n\n'
-          + '**Command List:**',
-      )
-      .addFields(
-        { name: '+help', value: 'Displays this message.' },
-        { name: '+ping', value: 'Pings the bot to check its online status.' },
-        {
-          name: '+progress/+p',
-          value:
-            'Shows the current progress of the next Worth the Candle batch of chapters. Please use in #bot-ez.',
-        },
-        { name: '+explain/+e', value: 'Given a story\'s acronym, outputs its full name and link. Full list can be accessed with "all" as an argument.' },
-        {
-          name: '+podcast',
-          value:
-            'Adds the role Rationally Writing to the user, in order to be reminded of new AW podcast releases. Use again to remove.',
-        },
-        {
-          name: '+flower',
-          value:
-            'Adds the role ´Flower´ to the user, in order to receive warnings that a new chapter has dropped in #flower. Use again to remove.',
-        },
-        { name: '+power', value: 'Outputs a random Alexander Walesque superpower with a drawback. +powerm is an alternate version by Bacontime which generates more obtuse powers.' },
-        {
-          name: '+testsearch <search term>',
-          value:
-            '(Direct Message only) Searches the entire text of Worth the Candle. Currently buggy and unreliable.',
-        },
-      );
-    message.channel.send(helpEmbed);
+    message.channel.send(getHelpEmbed());
   }
 
   if (command === 'ping') {
     const m = await message.channel.send('Ping?');
-    if (message.member) {
-      console.log(
-        `${message.member.user.tag
-        }(${
-          message.member.user
-        }) used command +ping.`,
-      );
-    } else console.log('Someone used command +ping.');
     m.edit(
       `Pong! Latency is ${
         m.createdTimestamp - message.createdTimestamp
@@ -290,14 +160,6 @@ client.on('message', async (message) => {
   }
 
   if (command === 'power') {
-    if (message.member) {
-      console.log(
-        `${message.member.user.tag
-        }(${
-          message.member.user
-        }) used command +power.`,
-      );
-    } else console.log('Someone used command +power.');
     const powerEmbed = new Discord.MessageEmbed()
       .setColor('#A4DACC')
       .setAuthor('Alexander Wales', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
@@ -306,14 +168,6 @@ client.on('message', async (message) => {
   }
 
   if (command === 'powerm') {
-    if (message.member) {
-      console.log(
-        `${message.member.user.tag
-        }(${
-          message.member.user
-        }) used command +powerm.`,
-      );
-    } else console.log('Someone used command +powerm.');
     const powermEmbed = new Discord.MessageEmbed()
       .setColor('#A4DACC')
       .setAuthor('Alexamder Walesm', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
@@ -328,38 +182,6 @@ client.on('message', async (message) => {
     || command === 'pog'
     || command === 'regress'
   ) {
-    if (message.member) {
-      console.log(
-        `${message.member.user.tag
-        }(${
-          message.member.user
-        }) used command +${
-          command
-        } in channel ${
-          message.channel.id
-        }.`,
-      );
-    } else {
-      console.log(
-        `Someone used command +${
-          command
-        } in channel ${
-          message.channel.id
-        }.`,
-      );
-    }
-
-    storyOver();
-
-    // fs.readFile('./config/credentials.json', (err, content) => {
-    //   if (err) return console.log('Error loading client secret file:', err);
-    // Authorize a client with credentials, then call the Google Sheets API.
-    //   authorize(JSON.parse(content), listProgress);
-    //   return true;
-    // });
-  }
-
-  if (command === 'asdf') {
     fs.readFile('./config/credentials.json', (err, content) => {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Sheets API.
@@ -369,14 +191,6 @@ client.on('message', async (message) => {
   }
 
   if (command === 'digress') {
-    if (message.member) {
-      console.log(
-        `${message.member.user.tag
-        }(${
-          message.member.user
-        }) used command +digress.`,
-      );
-    } else console.log('Someone used command +digress.');
     fs.readFile('./config/credentials.json', (err, content) => {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Sheets API.
@@ -413,31 +227,6 @@ client.on('message', async (message) => {
     message.channel.send({
       files: ['./images/dogress.png'],
     });
-  }
-
-  if (command === 'logress') {
-    if (message.member) {
-      message.channel.send(
-        `${message.member.user.tag
-        }(${
-          message.member.user
-        }) used command +${
-          command
-        } in channel ${
-          message.channel.name
-        } (${
-          message.channel.id
-        }).`,
-      );
-    } else {
-      message.channel.send(
-        `You used command +${
-          command
-        } in a private message or something spooky like that (${
-          message.channel.id
-        }).`,
-      );
-    }
   }
 
   if (
@@ -494,16 +283,6 @@ client.on('message', async (message) => {
 
   if (command === 'explain' || command === 'e') {
     const explained = args.join(' ');
-    if (message.member) {
-      console.log(
-        `${message.member.user.tag
-        }(${
-          message.member.user
-        }) used command +explain and asked for '${explained}'.`,
-      );
-    } else {
-      console.log(`Someone used command +explain and searched '${explained}'.`);
-    }
     if (explained.toUpperCase() === 'ALL' || explained === '*' || explained === '') {
       message.channel.send(
         'The full list of works available to this command is located at <https://discord.com/channels/437695037401464851/437697099383963668/848202602688282655>.',
@@ -517,71 +296,6 @@ client.on('message', async (message) => {
       message.channel.send(
         'I can\'t find that story among my 32768 books.',
       );
-    }
-  }
-
-  if (command === 'testsearch') {
-    const searchContent = args.join(' ');
-    if (message.member) {
-      console.log(
-        `${message.member.user.tag
-        }(${
-          message.member.user
-        }) used command +search and searched '${
-          searchContent
-        }'.`,
-      );
-    } else {
-      console.log(
-        `Someone used command +search and searched '${searchContent}'.`,
-      );
-      grep(searchContent, 'files/wtc.html', (list) => {
-        if (list.length > 0) {
-          let searchResults = '';
-          let i = 0;
-          list.forEach((row) => {
-            if (row.length > 0) {
-              i += 1;
-              let start = 0;
-              let end = 150;
-              const pattern = new RegExp(searchContent, 'gi');
-              const match = row.match(pattern);
-              if (row.indexOf(match[0]) > end) {
-                start = row.indexOf(match[0]) - 75;
-                end = row.indexOf(match[0]) + 75;
-              }
-              if (end > row.length) end = row.length;
-              if (end - start < 150) start = end - 150;
-              if (start < 0) start = 0;
-              // HACKERMAN AHEAD
-              searchResults
-                += `**Result ${
-                  i
-                }:** ...`
-                + `${turndownService
-                  .turndown(row)
-                  .replace('* * *', '')
-                  .trim()
-                  .slice(start, end)
-                  .replace('_', '')
-                  .replace(/\n/g, ' ')
-                  .split('**')
-                  .join('')
-                  .replace(pattern, '**$&**')}`
-                + '...'
-                + '\n';
-            }
-          });
-
-          if (searchResults.length > 1500) {
-            message.channel.send(
-              'Error displaying search results (result too big to display).',
-            );
-            console.log(searchResults);
-          } else if (searchResults !== '') message.channel.send(searchResults);
-          else message.channel.send('No matches found.');
-        } else message.channel.send('No matches found.');
-      });
     }
   }
 });
