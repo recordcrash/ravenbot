@@ -127,6 +127,8 @@ class Batch {
   static getEmbedDescription() {
     switch (Batch.globalStatus) {
       case Batch.FIRSTBATCH:
+        if (!Batch.batches[0].releaseDate) return 'Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) at an unknown date.\nNon-patrons will get the chapters two days later.';
+        return `Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) **${getDateString(Batch.nextReleaseDate())} CST**.\nNon-patrons will get the chapters two days later.`;
       case Batch.NORELEASE:
         return 'Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) at an unknown date.\nNon-patrons will get the chapters two days later.';
       case Batch.PRERELEASE:
@@ -177,8 +179,12 @@ class Batch {
     });
     // Push remaining dateless batch, if it exists
     if (chapters.length > 0) {
-      const batch = new Batch(batchNumber, null, [...chapters]);
-      Batch.batches.push(batch);
+      if (batchNumber === 1
+        || (batchNumber > 1 && Batch.batches[batchNumber - 2].releaseDate > new Date())) {
+        const batch = new Batch(batchNumber, null, [...chapters]);
+        Batch.batches.push(batch);
+      }
+      // Don't push if it's a future future batch
     }
     Batch.initializeGlobalStatus();
   }

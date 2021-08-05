@@ -61,7 +61,7 @@ client.on('message', async (message) => {
     const sheets = google.sheets({ version: 'v4', auth });
     sheets.spreadsheets.values.get(
       {
-        spreadsheetId: TEST_SPREADSHEET,
+        spreadsheetId: DUNGEONS_SPREADSHEET,
         range: 'A2:I',
       },
       (err, res) => {
