@@ -129,9 +129,8 @@ client.on('interactionCreate', async (interaction) => {
     explainCommand(interaction);
   }
 
-  if (interaction.commandName === 'getRole') {
-    const role = interaction.options.getString('role');
-    giveRoleToUser(interaction, role);
+  if (interaction.commandName === 'getrole') {
+    giveRoleToUser(interaction);
   }
 });
 
