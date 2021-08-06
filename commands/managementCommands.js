@@ -67,7 +67,7 @@ async function initializeCommands(client) {
       }],
     },
   ];
-  await client.guilds.cache.get(SERVER_IDS.TESTSERVER)?.commands.set(wtcCommands);
+  await client.guilds.cache.get(SERVER_IDS.ALEXANDERWALES)?.commands.set(wtcCommands);
   const commands = await client.application?.commands.set(wtcCommands);
   console.log(commands);
 }
