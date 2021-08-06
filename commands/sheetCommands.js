@@ -1,10 +1,10 @@
 const Discord = require('discord.js');
 const { Batch } = require('../classes/batch');
-const { IMAGE_URLS, PROGRESS_EMBED_COLOR } = require('../config/constants');
+const { IMAGE_URLS, PROGRESS_EMBED_COLOR } = require('../helpers/constants');
 const { getDateTimeString } = require('../helpers/dates');
 
 function handleGrandTotal(storage, message) {
-  const { grandTotal } = Batch;
+  const grandTotal = Number(Batch.grandTotal);
   console.log(`Grand total is: ${grandTotal}`);
 
   if (storage.getItemSync('grandtotal') !== grandTotal) {
@@ -46,7 +46,7 @@ function getProgressFromSheet(res, message, storage) {
 
     const embed = buildNextChapterEmbed();
 
-    message.channel.send(embed).then((sent) => {
+    message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } }).then((sent) => {
       // React if numbers went up, but only outside private messages
       if (message.member) handleGrandTotal(storage, sent);
     });
@@ -57,4 +57,19 @@ function getProgressFromSheet(res, message, storage) {
   return true;
 }
 
-module.exports = { getProgressFromSheet };
+function getWogFromSheet(res, message) {
+  const rows = res.data.values;
+  if (rows.length) {
+    const wogs = rows.map((value) => value[0]);
+    const links = rows.map((value) => value[1]);
+    const randomIndex = Math.floor(Math.random() * wogs.length);
+    const wogEmbed = new Discord.MessageEmbed()
+      .setColor('#A4DACC')
+      .setAuthor('Alexander Wales', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
+      .setDescription(wogs[randomIndex]);
+    if (links[randomIndex]) { wogEmbed.addFields({ name: 'Link', value: links[randomIndex].match(/=hyperlink\("([^"]+)"/i) ? links[randomIndex].match(/=hyperlink\("([^"]+)"/i)[1] : 'Error fetching link' }); }
+    message.reply({ embeds: [wogEmbed] });
+  }
+}
+
+module.exports = { getProgressFromSheet, getWogFromSheet };

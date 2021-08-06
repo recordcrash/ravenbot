@@ -1,7 +1,7 @@
 const readline = require('readline');
 const fs = require('fs');
 const { google } = require('googleapis');
-const { SCOPES, TOKEN_PATH } = require('../config/constants');
+const { SCOPES, TOKEN_PATH } = require('../helpers/constants');
 
 /**
  * Get and store new token after prompting for user authorization, and then

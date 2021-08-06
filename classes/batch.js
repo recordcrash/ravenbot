@@ -162,7 +162,7 @@ class Batch {
     let batchNumber = 1;
     sheetRows.forEach((row) => {
       const chapterNumber = row[CHAPTER_COL];
-      const chapterWords = row[WORDS_COL];
+      const chapterWords = Number(row[WORDS_COL]);
       const chapterNotes = row[NOTES_COL] === '' ? null : row[NOTES_COL];
       const chapter = new Chapter(chapterNumber, chapterWords, chapterNotes);
       const batchDate = row[DATE_COL];
@@ -174,7 +174,7 @@ class Batch {
           batchNumber += 1;
           chapters.length = 0;
         }
-        Batch.grandTotal += chapterWords;
+        Batch.grandTotal += Number(chapterWords);
       }
     });
     // Push remaining dateless batch, if it exists

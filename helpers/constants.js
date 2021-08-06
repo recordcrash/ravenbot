@@ -106,6 +106,10 @@ const POWERM_SUFFIX = ['accumulation', 'acoustics', 'affinity', 'alteration', 'a
   'stomy', 'synthesis', 'technics', 'therapy', 'tomy', 'toxicity', 'transfer', 'transit', 'trophy', 'vision', 'voyance', 'warding'];
 
 const EXPLANATIONS = {
+  TUTBAD: {
+    name: 'This Used To Be About Dungeons',
+    link: 'https://www.youtube.com/watch?v=fq3abPnEEGE',
+  },
   OVDT: {
     name: 'Only Villains Do That',
     link: 'https://www.royalroad.com/fiction/40182',
@@ -216,6 +220,12 @@ const IMAGE_URLS = {
   DUNGEONS: 'https://i.imgur.com/yJYl2xP.png',
 };
 
+const SERVER_IDS = {
+  ALEXANDERWALES: '437695037401464851',
+  HSD: '152981670507577344',
+  TESTSERVER: '360684237671890945',
+};
+
 const PROGRESS_EMBED_COLOR = '#3E8771';
 
 module.exports = {
@@ -234,4 +244,5 @@ module.exports = {
   POWERM_SUFFIX,
   IMAGE_URLS,
   PROGRESS_EMBED_COLOR,
+  SERVER_IDS,
 };

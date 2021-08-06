@@ -1,61 +1,60 @@
 // **RavenBot Main Loop**
 
-const Discord = require('discord.js');
+const { Client, Intents, MessageEmbed } = require('discord.js');
 const storage = require('node-persist');
 const fs = require('fs');
 const { google } = require('googleapis');
 const {
-  BANNED_CHANNEL_IDS, WTC_SPREADSHEET, WOG_SPREADSHEET, EXPLANATIONS,
+  BANNED_CHANNEL_IDS, WTC_SPREADSHEET, WOG_SPREADSHEET,
   TEST_SPREADSHEET, DUNGEONS_SPREADSHEET,
-} = require('./config/constants');
+} = require('./helpers/constants');
 const { authorize } = require('./config/google');
-const { getProgressFromSheet } = require('./commands/sheetCommands');
+const { getProgressFromSheet, getWogFromSheet } = require('./commands/sheetCommands');
 const { generatePower, generatePowerm } = require('./commands/powerCommands');
 const { getHelpEmbed } = require('./commands/staticCommands');
+const { explainCommand } = require('./commands/constantCommands');
+const { giveRoleToUser } = require('./commands/roleCommands');
+const { initializeCommands } = require('./commands/managementCommands');
+const config = require('./config/config.json');
+
+// Client options with intents for new Discord API v9
+const clientOptions = {
+  intents: [
+    Intents.FLAGS.GUILDS, // Channels joined
+    Intents.FLAGS.GUILD_MESSAGES, // Messages in a server
+    Intents.FLAGS.DIRECT_MESSAGES, // Direct messages sent to bot
+  ],
+  partials: [
+    'CHANNEL', // Need to enable to see DMs
+  ],
+};
+
+// Invite URL
+// https://discord.com/oauth2/authorize?client_id=872531052420280372&scope=bot+applications.commands&permissions=260316196049
 
 // Persistent storage for grand total
 storage.initSync();
 
-const client = new Discord.Client();
-const config = require('./config/config.json');
+// Initialize discord client
+const client = new Client(clientOptions);
 
+// Finally, Ravenbot Begins
 client.on('ready', () => {
   console.log(
     `Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.`,
   );
-  client.user.setActivity('exposition fairy');
+  client.user.setPresence({ activities: [{ name: 'exposition fairy' }] });
   /* set avatar (only needs to be done once)
   client.user.setAvatar('./images/raven.jpg')
     .then(() => console.log('Avatar set!'))
     .catch(console.error); */
 });
 
-client.on('guildCreate', (guild) => {
-  console.log(
-    `New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`,
-  );
-  client.user.setActivity('exposition fairy');
-});
-
-client.on('guildDelete', (guild) => {
-  console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
-  client.user.setActivity('exposition fairy');
-});
-
-client.on('message', async (message) => {
-  if (BANNED_CHANNEL_IDS.includes(message.channel.id)) return;
-  if (message.author.bot) return;
-
-  if (message.content.indexOf(config.prefix) !== 0) return;
-
-  const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-  const command = args.shift().toLowerCase();
-
-  if (message.member) {
-    console.log(`${message.member.user.tag}(${message.member.user}) used command +${command} in channel ${message.channel.id}.`);
-  } else {
-    console.log(`Someone used command +${command} in channel ${message.channel.id}.`);
-  }
+// Slash commands
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return;
+  if (BANNED_CHANNEL_IDS.includes(interaction.channel.id)) return;
+  console.log(interaction);
 
   function listProgress(auth) {
     const sheets = google.sheets({ version: 'v4', auth });
@@ -66,10 +65,10 @@ client.on('message', async (message) => {
       },
       (err, res) => {
         if (err) {
-          message.channel.send(`Error contacting the Discord API: ${err}`);
+          interaction.reply(`Error contacting the Discord API: ${err}`);
           return console.log(`The API returned an error: ${err}`);
         }
-        getProgressFromSheet(res, message, storage, command);
+        getProgressFromSheet(res, interaction, storage);
         return true;
       },
     );
@@ -85,166 +84,105 @@ client.on('message', async (message) => {
       },
       (err, res) => {
         if (err) {
-          message.channel.send(`Error contacting the Discord API: ${err}`);
+          interaction.reply(`Error contacting the Discord API: ${err}`);
           return console.log(`The API returned an error: ${err}`);
         }
-        const rows = res.data.values;
-        if (rows.length) {
-          const wogs = rows.map((value) => value[0]);
-          const links = rows.map((value) => value[1]);
-          const randomIndex = Math.floor(Math.random() * wogs.length);
-          const wogEmbed = new Discord.MessageEmbed()
-            .setColor('#A4DACC')
-            .setAuthor('Alexander Wales', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
-            .setDescription(wogs[randomIndex]);
-          if (links[randomIndex]) { wogEmbed.addFields({ name: 'Link', value: links[randomIndex].match(/=hyperlink\("([^"]+)"/i) ? links[randomIndex].match(/=hyperlink\("([^"]+)"/i)[1] : 'Error fetching link' }); }
-          message.channel.send(wogEmbed);
-        }
+        getWogFromSheet(res, interaction);
         return true;
       },
     );
   }
 
-  if (command === 'help') {
-    message.channel.send(getHelpEmbed());
+  if (interaction.commandName === 'help') {
+    interaction.reply({ embeds: [getHelpEmbed()], allowedMentions: { repliedUser: false } });
   }
 
-  if (command === 'ping') {
-    const m = await message.channel.send('Ping?');
-    m.edit(
-      `Pong! Latency is ${
-        m.createdTimestamp - message.createdTimestamp
-      }ms. API Latency is ${Math.round(client.ws.ping)}ms`,
-    );
-  }
-
-  if (command === 'power') {
-    const powerEmbed = new Discord.MessageEmbed()
+  if (interaction.commandName === 'power') {
+    const method = interaction.options.getString('method');
+    const powerDescription = method === 'bacontime' ? generatePowerm() : generatePower();
+    const powerEmbed = new MessageEmbed()
       .setColor('#A4DACC')
       .setAuthor('Alexander Wales', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
-      .setDescription(generatePower());
-    message.channel.send(powerEmbed);
+      .setDescription(powerDescription);
+    interaction.reply({ embeds: [powerEmbed], allowedMentions: { repliedUser: false } });
   }
 
-  if (command === 'powerm') {
-    const powermEmbed = new Discord.MessageEmbed()
-      .setColor('#A4DACC')
-      .setAuthor('Alexamder Walesm', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
-      .setDescription(generatePowerm());
-    message.channel.send(powermEmbed);
-  }
-
-  if (
-    command === 'progress'
-    || command === 'p'
-    || command === 'pogress'
-    || command === 'pog'
-    || command === 'regress'
-  ) {
+  if (['p', 'progress', 'pogress', 'pog', 'regress'].includes(interaction.commandName)) {
     fs.readFile('./config/credentials.json', (err, content) => {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Sheets API.
-      authorize(JSON.parse(content), listProgress);
+      authorize(JSON.parse(content), listProgress, interaction);
       return true;
     });
   }
 
-  if (command === 'digress') {
+  if (interaction.commandName === 'digress') {
     fs.readFile('./config/credentials.json', (err, content) => {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Sheets API.
-      authorize(JSON.parse(content), listWog);
+      authorize(JSON.parse(content), listWog, interaction);
       return true;
     });
   }
+
+  if (interaction.commandName === 'explain' || interaction.commandName === 'e') {
+    explainCommand(interaction);
+  }
+
+  if (interaction.commandName === 'getRole') {
+    const role = interaction.options.getString('role');
+    giveRoleToUser(interaction, role);
+  }
+});
+
+// Regular commands
+client.on('messageCreate', async (message) => {
+  if (BANNED_CHANNEL_IDS.includes(message.channel.id)) return;
+  if (message.author.bot) return;
+  if (message.content.indexOf(config.prefix) !== 0) return;
+
+  const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
+  const command = args.shift().toLowerCase();
+
+  if (message.member) {
+    console.log(`${message.member.user.tag}(${message.member.user}) used command +${command} in channel ${message.channel.id}.`);
+  } else console.log(`Someone used command +${command} in channel ${message.channel.id}.`);
 
   if (command === 'egress') {
-    message.channel.send({
-      files: ['./images/egress.jpg'],
-    });
+    message.reply({ files: ['./images/egress.jpg'], allowedMentions: { repliedUser: false } });
   }
 
   if (command === 'congress') {
-    message.channel.send({
-      files: ['./images/congress.jpg'],
-    });
+    message.reply({ files: ['./images/congress.jpg'], allowedMentions: { repliedUser: false } });
   }
 
   if (command === 'cypress') {
-    message.channel.send({
-      files: ['./images/cypress.png'],
-    });
+    message.reply({ files: ['./images/cypress.jpg'], allowedMentions: { repliedUser: false } });
   }
 
   if (command === 'frogress') {
-    message.channel.send({
-      files: ['./images/frogress.png'],
-    });
+    message.reply({ files: ['./images/frogress.png'], allowedMentions: { repliedUser: false } });
   }
 
   if (command === 'dogress') {
-    message.channel.send({
-      files: ['./images/dogress.png'],
-    });
+    message.reply({ files: ['./images/dogress.png'], allowedMentions: { repliedUser: false } });
   }
 
-  if (
-    command === 'podcast'
-    || command === 'flower'
-  ) {
-    let rolename = 'Role name';
-    let addmsg = `\`${rolename}\` role added successfully.`;
-    if (command === 'podcast') {
-      rolename = 'Rationally Writing';
-      addmsg = `\`${rolename}\` role added successfully. Listen to the podcast at <http://daystareld.com/podcasts/rationally-writing/>`;
-    }
-    if (command === 'flower') {
-      rolename = 'Flower';
-      addmsg = `\`${rolename}\` role added successfully. Read the story at <https://www.royalroad.com/fiction/28806> and discuss it in #flower.`;
-    }
-
-    if (message.member) {
-      if (
-        !message.member.roles.cache.some(
-          (role) => role.name === rolename,
-        )
-      ) {
-        const role = message.guild.roles.cache.find(
-          (rol) => rol.name === rolename,
-        );
-        message.member.roles.add(role);
-        message.channel.send(addmsg);
-      } else {
-        const role = message.guild.roles.cache.find(
-          (rol) => rol.name === rolename,
-        );
-        message.member.roles.remove(role);
-        message.channel.send(`\`${rolename}\` role removed successfully.`);
-      }
-    } else {
-      message.channel.send(
-        'You need more Degrees of Reasonableness in order to use this command in a Direct Message.',
-      );
-    }
+  if (command === 'initializecommands') {
+    initializeCommands(client);
   }
+});
 
-  if (command === 'explain' || command === 'e') {
-    const explained = args.join(' ');
-    if (explained.toUpperCase() === 'ALL' || explained === '*' || explained === '') {
-      message.channel.send(
-        'The full list of works available to this command is located at <https://discord.com/channels/437695037401464851/437697099383963668/848202602688282655>.',
-      );
-    } else if (explained.toUpperCase() in EXPLANATIONS) {
-      const story = EXPLANATIONS[explained.toUpperCase()];
-      message.channel.send(
-        `I've found something called ***${story.name}***. Is this what you were looking for? ${story.link}`,
-      );
-    } else {
-      message.channel.send(
-        'I can\'t find that story among my 32768 books.',
-      );
-    }
-  }
+client.on('guildCreate', (guild) => {
+  console.log(
+    `New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`,
+  );
+  client.user.setActivity('exposition fairy');
+});
+
+client.on('guildDelete', (guild) => {
+  console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
+  client.user.setActivity('exposition fairy');
 });
 
 client.login(config.token);

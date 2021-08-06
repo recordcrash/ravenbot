@@ -1,6 +1,6 @@
 const {
   POWERS, POWER_MODIFIERS, POWERM_ADJECTIVE, POWERM_PREFIX, POWERM_SUFFIX,
-} = require('../config/constants');
+} = require('../helpers/constants');
 
 function generatePower() {
   const butand = ['but', 'and'];

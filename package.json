@@ -11,9 +11,9 @@
   "license": "MIT",
   "dependencies": {
     "cron": "^1.8.2",
-    "discord.js": "^12.3.1",
+    "discord.js": "^13.0.0",
     "fs": "0.0.1-security",
-    "googleapis": "^39.2.0",
+    "googleapis": "^83.0.0",
     "http": "0.0.0",
     "node-persist": "^2.1.0",
     "showdown": "^1.9.1",
