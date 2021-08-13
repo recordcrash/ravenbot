@@ -20,11 +20,11 @@ function handleGrandTotal(storage, message) {
   storage.setItemSync('grandtotal', grandTotal);
 }
 
-function buildNextChapterEmbed() {
+function buildBatchEmbed(batch) {
   const embed = new Discord.MessageEmbed()
     .setColor(PROGRESS_EMBED_COLOR)
-    .setTitle(Batch.getEmbedTitle())
-    .setDescription(Batch.getEmbedDescription())
+    .setTitle(batch.embedTitle)
+    .setDescription(batch.embedDescription)
     .setURL(
       'https://docs.google.com/spreadsheets/d/1K9hOvGMlydZ-9voY6FAFUyi_-cVd0ZxROoC3PD432dw',
     )
@@ -33,26 +33,102 @@ function buildNextChapterEmbed() {
       IMAGE_URLS.DUNGEONS,
       'https://www.royalroad.com/fiction/25137/worth-the-candle',
     )
-    .addFields(Batch.getEmbedFields());
+    .addFields(batch.embedFields);
   return embed;
 }
 
-function getProgressFromSheet(res, message, storage) {
+function getBatchEmbed(batch) {
+  const embed = buildBatchEmbed(batch);
+  return embed;
+}
+
+function getBatchComponents(batch) {
+  const components = [];
+
+  const previousButton = new Discord.MessageButton()
+    .setCustomId('previousButton')
+    .setStyle('PRIMARY')
+    .setLabel('◀');
+
+  const previousButtonDisabled = new Discord.MessageButton()
+    .setCustomId('previousButtonDisabled')
+    .setStyle('PRIMARY')
+    .setLabel('◀')
+    .setDisabled(true);
+
+  const nextButton = new Discord.MessageButton()
+    .setCustomId('nextButton')
+    .setStyle('PRIMARY')
+    .setLabel('▶');
+
+  const nextButtonDisabled = new Discord.MessageButton()
+    .setCustomId('nextButton')
+    .setStyle('PRIMARY')
+    .setLabel('▶')
+    .setDisabled(true);
+
+  components.push(batch.isNotFirst ? previousButton : previousButtonDisabled);
+  components.push(batch.isNotLast ? nextButton : nextButtonDisabled);
+  return components;
+}
+
+function getBatchRow(batch) {
+  return new Discord.MessageActionRow({ components: getBatchComponents(batch) });
+}
+
+function getProgressFromSheet(res, interaction, storage) {
   const rows = res.data.values;
   if (rows.length) {
     const updateDateString = storage.getItemSync('updateDate') || 'No value yet!';
 
+    let currentBatchPosition = 0;
+
     Batch.initializeBatchManager(rows, updateDateString);
+    let batch = Batch.getBatch(currentBatchPosition);
+    const embed = getBatchEmbed(batch);
 
-    const embed = buildNextChapterEmbed();
-
-    message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } }).then((sent) => {
+    interaction.reply({
+      embeds: [embed],
+      components: [getBatchRow(batch)],
+      allowedMentions: { repliedUser: false },
+    }).then((sent) => {
       // React if numbers went up, but only outside private messages
-      if (message.member) handleGrandTotal(storage, sent);
+      if (interaction.member) handleGrandTotal(storage, sent);
+
+      // Handle button interactions
+      const filter = (i) => i.customId === 'previousButton' || i.customId === 'nextButton';
+
+      const collector = interaction.channel.createMessageComponentCollector(
+        { filter, time: 150000 },
+      );
+
+      collector.on('collect', async (i) => {
+        if (i.customId === 'previousButton') {
+          currentBatchPosition -= 1;
+          batch = Batch.getBatch(currentBatchPosition);
+          await i.update({
+            embeds: [getBatchEmbed(batch)],
+            components: [getBatchRow(batch)],
+          });
+        }
+        if (i.customId === 'nextButton') {
+          currentBatchPosition += 1;
+          batch = Batch.getBatch(currentBatchPosition);
+          await i.update({
+            embeds: [getBatchEmbed(batch)],
+            components: [getBatchRow(batch)],
+          });
+        }
+      });
+
+      collector.on('end', () => interaction.update({
+        embeds: [getBatchEmbed(batch)],
+        components: [],
+      }));
     });
   } else {
     console.log('No data found.');
-    message.channel.send('Error contacting the server.');
+    interaction.reply('Error contacting the server.');
   }
   return true;
 }

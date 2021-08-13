@@ -110,6 +110,10 @@ const EXPLANATIONS = {
     name: 'This Used To Be About Dungeons',
     link: 'https://www.youtube.com/watch?v=fq3abPnEEGE',
   },
+  AIROT: {
+    name: 'An Infinite Recursion of Time',
+    link: 'https://www.royalroad.com/fiction/43761/an-infinite-recursion-of-time',
+  },
   OVDT: {
     name: 'Only Villains Do That',
     link: 'https://www.royalroad.com/fiction/40182',
