@@ -93,7 +93,7 @@ function getProgressFromSheet(res, interaction, storage) {
       allowedMentions: { repliedUser: false },
     }).then((sent) => {
       // React if numbers went up, but only outside private messages
-      if (interaction.member) handleGrandTotal(storage, sent);
+      if (interaction.member && sent) handleGrandTotal(storage, sent);
 
       // Handle button interactions
       const filter = (i) => i.customId === 'previousButton' || i.customId === 'nextButton';
@@ -121,7 +121,7 @@ function getProgressFromSheet(res, interaction, storage) {
         }
       });
 
-      collector.on('end', () => interaction.update({
+      collector.on('end', () => interaction.editReply({
         embeds: [getBatchEmbed(batch)],
         components: [],
       }));
