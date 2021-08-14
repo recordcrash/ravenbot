@@ -31,7 +31,7 @@ function buildBatchEmbed(batch) {
     .setAuthor(
       'This Used To Be About Dungeons',
       IMAGE_URLS.DUNGEONS,
-      'https://www.royalroad.com/fiction/25137/worth-the-candle',
+      'https://www.royalroad.com/fiction/45534/this-used-to-be-about-dungeons',
     )
     .addFields(batch.embedFields);
   return embed;

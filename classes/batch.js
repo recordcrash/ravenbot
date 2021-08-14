@@ -114,16 +114,13 @@ class Batch {
   get embedDescription() {
     switch (this.releaseStatus) {
       case Batch.FIRSTBATCH:
-        if (!Batch.batches[0].releaseDate) return 'Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) at an unknown date.\nNon-patrons will get the chapters two days later.';
-        return `Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) **${getDateString(this.ebReleaseDate)} CST**.
-        Available for everyone else **${getDateString(this.releaseDate)} CST**`;
+        return `Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) **${getDateString(this.ebReleaseDate)} CST**.\nAvailable for everyone else **${getDateString(this.releaseDate)} CST**`;
       case Batch.NORELEASE:
         return 'Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) at an unknown date.\nNon-patrons will get the chapters two days later.';
       case Batch.PRERELEASE:
-        return `Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) **${getDateString(this.ebReleaseDate)} CST**.
-        Available for everyone else **${getDateString(this.releaseDate)} CST**`;
+        return `Available for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales) **${getDateString(this.ebReleaseDate)} CST**.\nAvailable for everyone else **${getDateString(this.releaseDate)} CST**`;
       case Batch.POSTRELEASE:
-        return `Last available batch released **${getDateString(this.ebReleaseDate)}** for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales).\n`;
+        return `Batch released **${getDateString(this.ebReleaseDate)}** for the [Early Birds Patreon tier](https://www.patreon.com/alexanderwales).\n`;
       default:
         return 'You really shouldn\'t be able to see this';
     }
@@ -183,6 +180,7 @@ class Batch {
 
     let batchNumber = 1;
     let currentBatchDate = sheetRows[0][DATE_COL];
+    let currentBatchEbDate = sheetRows[0][EB_DATE_COL];
     sheetRows.forEach((row) => {
       const chapterNumber = row[CHAPTER_COL];
       const chapterWords = Number(row[WORDS_COL]);
@@ -194,8 +192,12 @@ class Batch {
         Batch.grandTotal += Number(chapterWords);
         // If date has changed, the previous chapters were a batch
         if (date && date !== currentBatchDate) {
-          const batch = new Batch(batchNumber, new Date(earlyDate), new Date(date), [...chapters]);
+          const batch = new Batch(batchNumber,
+            new Date(currentBatchEbDate),
+            new Date(currentBatchDate),
+            [...chapters]);
           currentBatchDate = date;
+          currentBatchEbDate = earlyDate;
           Batch.batches.push(batch);
           batchNumber += 1;
           chapters.length = 0;
@@ -208,6 +210,8 @@ class Batch {
       const batch = new Batch(batchNumber, null, null, [...chapters]);
       Batch.batches.push(batch);
     }
+
+    console.log(util.inspect(Batch.batches));
   }
 }
 
