@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const { Batch } = require('../classes/batch');
+const { StatDay } = require('../classes/statDay');
 const { IMAGE_URLS, PROGRESS_EMBED_COLOR } = require('../helpers/constants');
 const { getDateTimeString } = require('../helpers/dates');
 
@@ -133,7 +134,15 @@ function getProgressFromSheet(res, interaction, storage) {
   return true;
 }
 
-function getWogFromSheet(res, message) {
+function getStatsFromSheet(res, interaction) {
+  const rows = res.data.values;
+  if (rows.length) {
+    StatDay.initializeStatsManager(rows);
+    interaction.reply({ files: [{ attachment: StatDay.getChartUrl(), name: 'chart.png' }] });
+  }
+}
+
+function getWogFromSheet(res, interaction) {
   const rows = res.data.values;
   if (rows.length) {
     const wogs = rows.map((value) => value[0]);
@@ -144,8 +153,8 @@ function getWogFromSheet(res, message) {
       .setAuthor('Alexander Wales', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')
       .setDescription(wogs[randomIndex]);
     if (links[randomIndex]) { wogEmbed.addFields({ name: 'Link', value: links[randomIndex].match(/=hyperlink\("([^"]+)"/i) ? links[randomIndex].match(/=hyperlink\("([^"]+)"/i)[1] : 'Error fetching link' }); }
-    message.reply({ embeds: [wogEmbed] });
+    interaction.reply({ embeds: [wogEmbed] });
   }
 }
 
-module.exports = { getProgressFromSheet, getWogFromSheet };
+module.exports = { getProgressFromSheet, getWogFromSheet, getStatsFromSheet };

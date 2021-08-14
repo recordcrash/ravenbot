@@ -17,13 +17,13 @@ class Batch {
     this.words = this.chapters.reduce((sum, { words }) => sum + words, 0);
   }
 
-  static #_FIRSTBATCH = 'First batch'; // Edge case when bot starts functioning, only one batch exists
+  static #_FIRSTBATCH = 'First batch'; // Batch is the first batch in the array
 
-  static #_PRERELEASE = 'Pre-release'; // Next batch is finished, but its date is in the future
+  static #_PRERELEASE = 'Pre-release'; // Batch is finished, but its date is in the future
 
-  static #_POSTRELEASE = 'Post-release'; // Next batch is finished, but its date is in the past
+  static #_POSTRELEASE = 'Post-release'; // Batch is finished, but its date is in the past
 
-  static #_NORELEASE = 'No release date'; // Next batch has no date, usual case
+  static #_NORELEASE = 'No release date'; // Batch has no date, usual case
 
   static #_ERROR = 'I AM ERROR'; // Edge case, need to add new condition
 

@@ -10,7 +10,11 @@ async function initializeCommands(client) {
     },
     {
       name: 'progress',
-      description: 'Shows the current progress of the next TUTBAD batch of chapters',
+      description: 'Shows the current progress of the next TUTBAD chapters',
+    },
+    {
+      name: 'stats',
+      description: 'Shows the TUTBAD writing stats by Alexander Wales',
     },
     {
       name: 'digress',

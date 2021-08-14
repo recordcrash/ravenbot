@@ -9,7 +9,7 @@ const {
   TEST_SPREADSHEET, DUNGEONS_SPREADSHEET,
 } = require('./helpers/constants');
 const { authorize } = require('./config/google');
-const { getProgressFromSheet, getWogFromSheet } = require('./commands/sheetCommands');
+const { getProgressFromSheet, getWogFromSheet, getStatsFromSheet } = require('./commands/sheetCommands');
 const { generatePower, generatePowerm } = require('./commands/powerCommands');
 const { getHelpEmbed } = require('./commands/staticCommands');
 const { explainCommand } = require('./commands/constantCommands');
@@ -93,6 +93,25 @@ client.on('interactionCreate', async (interaction) => {
     );
   }
 
+  function printStats(auth) {
+    const sheets = google.sheets({ version: 'v4', auth });
+    sheets.spreadsheets.values.get(
+      {
+        spreadsheetId: DUNGEONS_SPREADSHEET,
+        range: 'Speed Stats!A1:C90',
+        valueRenderOption: 'FORMULA',
+      },
+      (err, res) => {
+        if (err) {
+          interaction.reply(`Error contacting the Discord API: ${err}`);
+          return console.log(`The API returned an error: ${err}`);
+        }
+        getStatsFromSheet(res, interaction);
+        return true;
+      },
+    );
+  }
+
   if (interaction.commandName === 'help') {
     interaction.reply({ embeds: [getHelpEmbed()], allowedMentions: { repliedUser: false } });
   }
@@ -107,7 +126,7 @@ client.on('interactionCreate', async (interaction) => {
     interaction.reply({ embeds: [powerEmbed], allowedMentions: { repliedUser: false } });
   }
 
-  if (['p', 'progress', 'pogress', 'pog', 'regress'].includes(interaction.commandName)) {
+  if (interaction.commandName === 'progress') {
     fs.readFile('./config/credentials.json', (err, content) => {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Sheets API.
@@ -121,6 +140,15 @@ client.on('interactionCreate', async (interaction) => {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Sheets API.
       authorize(JSON.parse(content), listWog, interaction);
+      return true;
+    });
+  }
+
+  if (interaction.commandName === 'stats') {
+    fs.readFile('./config/credentials.json', (err, content) => {
+      if (err) return console.log('Error loading client secret file:', err);
+      // Authorize a client with credentials, then call the Google Sheets API.
+      authorize(JSON.parse(content), printStats, interaction);
       return true;
     });
   }
