@@ -108,7 +108,7 @@ const POWERM_SUFFIX = ['accumulation', 'acoustics', 'affinity', 'alteration', 'a
 const EXPLANATIONS = {
   TUTBAD: {
     name: 'This Used To Be About Dungeons',
-    link: 'https://www.youtube.com/watch?v=fq3abPnEEGE',
+    link: 'https://www.royalroad.com/fiction/45534/this-used-to-be-about-dungeons',
   },
   AIROT: {
     name: 'An Infinite Recursion of Time',
