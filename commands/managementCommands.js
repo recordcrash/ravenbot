@@ -1,6 +1,3 @@
-/* eslint-disable no-restricted-syntax */
-const { SERVER_IDS } = require('../helpers/constants');
-
 async function initializeCommands(client) {
   console.log('Initializing commands...');
   const wtcCommands = [
@@ -46,6 +43,10 @@ async function initializeCommands(client) {
           {
             name: 'Bacontime method (based on auto-generated words)',
             value: 'bacontime',
+          },
+          {
+            name: 'Magic item power (based on perchance.org words)',
+            value: 'entad',
           },
         ],
       }],

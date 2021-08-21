@@ -10,7 +10,7 @@ const {
 } = require('./helpers/constants');
 const { authorize } = require('./config/google');
 const { getProgressFromSheet, getWogFromSheet, getStatsFromSheet } = require('./commands/sheetCommands');
-const { generatePower, generatePowerm } = require('./commands/powerCommands');
+const { generatePower, generatePowerm, generateEntad } = require('./commands/powerCommands');
 const { getHelpEmbed } = require('./commands/staticCommands');
 const { explainCommand } = require('./commands/constantCommands');
 const { giveRoleToUser } = require('./commands/roleCommands');
@@ -118,7 +118,18 @@ client.on('interactionCreate', async (interaction) => {
 
   if (interaction.commandName === 'power') {
     const method = interaction.options.getString('method');
-    const powerDescription = method === 'bacontime' ? generatePowerm() : generatePower();
+    let powerDescription = 'Power failed to generate.';
+    switch (method) {
+      case 'bacontime':
+        powerDescription = generatePowerm();
+        break;
+      case 'entad':
+        powerDescription = generateEntad();
+        break;
+      default:
+        powerDescription = generatePower();
+        break;
+    }
     const powerEmbed = new MessageEmbed()
       .setColor('#A4DACC')
       .setAuthor('Alexander Wales', 'https://www.royalroadcdn.com/public/avatars/avatar-119608.png')

@@ -2,14 +2,25 @@ const {
   POWERS, POWER_MODIFIERS, POWERM_ADJECTIVE, POWERM_PREFIX, POWERM_SUFFIX,
 } = require('../helpers/constants');
 
+const { OBJECTS } = require('../helpers/objects');
+const { ADJECTIVES } = require('../helpers/adjectives');
+
+function fetchRandom(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function capitalizeAllWords(string) {
+  return string.replace(/(^\w{1})|(\s{1}\w{1})/g, (match) => match.toUpperCase());
+}
+
 function generatePower() {
   const butand = ['but', 'and'];
   let sentence = '';
-  sentence += POWERS[Math.floor(Math.random() * POWERS.length)];
+  sentence += fetchRandom(POWERS);
   sentence += '. Yes, ';
-  sentence += butand[Math.floor(Math.random() * butand.length)];
+  sentence += fetchRandom(butand);
   sentence += ' ';
-  sentence += POWER_MODIFIERS[Math.floor(Math.random() * POWER_MODIFIERS.length)];
+  sentence += fetchRandom(POWER_MODIFIERS);
   sentence += '.';
   return sentence;
 }
@@ -17,14 +28,20 @@ function generatePower() {
 function generatePowerm() {
   const butand = ['but', 'and'];
   let sentence = '';
-  sentence += POWERM_PREFIX[Math.floor(Math.random() * POWERM_PREFIX.length)];
-  sentence += POWERM_SUFFIX[Math.floor(Math.random() * POWERM_SUFFIX.length)];
+  sentence += fetchRandom(POWERM_PREFIX);
+  sentence += fetchRandom(POWERM_SUFFIX);
   sentence += '. Yes, ';
-  sentence += butand[Math.floor(Math.random() * butand.length)];
+  sentence += fetchRandom(butand);
   sentence += ' ';
-  sentence += POWERM_ADJECTIVE[Math.floor(Math.random() * POWERM_ADJECTIVE.length)];
+  sentence += fetchRandom(POWERM_ADJECTIVE);
   sentence += '.';
   return sentence;
 }
 
-module.exports = ({ generatePower, generatePowerm });
+function generateEntad() {
+  const adjective = fetchRandom(ADJECTIVES);
+  const item = fetchRandom(OBJECTS);
+  return `${capitalizeAllWords(adjective)} ${capitalizeAllWords(item)}`;
+}
+
+module.exports = ({ generatePower, generatePowerm, generateEntad });
