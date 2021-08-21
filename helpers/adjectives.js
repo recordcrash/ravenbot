@@ -1,3 +1,5 @@
+// Source: https://randomwordgenerator.com/adjective.php
+
 const ADJECTIVES = [
   'different',
   'used',

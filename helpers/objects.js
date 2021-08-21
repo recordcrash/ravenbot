@@ -1,3 +1,5 @@
+// Source: https://perchance.org/object
+
 const OBJECTS = [
   'CD',
   'Christmas ornament',
