@@ -134,11 +134,11 @@ function getProgressFromSheet(res, interaction, storage) {
   return true;
 }
 
-function getStatsFromSheet(res, interaction) {
+function getStatsFromSheet(res, interaction, frequency) {
   const rows = res.data.values;
   if (rows.length) {
     StatDay.initializeStatsManager(rows);
-    interaction.reply({ files: [{ attachment: StatDay.getChartUrl(), name: 'chart.png' }] });
+    interaction.reply({ files: [{ attachment: StatDay.getChartUrl(frequency), name: 'chart.png' }] });
   }
 }
 

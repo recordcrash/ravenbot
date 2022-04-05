@@ -11,7 +11,27 @@ async function initializeCommands(client) {
     },
     {
       name: 'stats',
-      description: 'Shows the TUTBAD writing stats by Alexander Wales',
+      description: 'Shows the TUTBAD writing average by Alexander Wales',
+      options: [{
+        name: 'frequency',
+        type: 'STRING',
+        description: 'The frequency on which the rolling word average is calculated (daily, weekly or monthly).',
+        required: true,
+        choices: [
+          {
+            name: 'Daily word count',
+            value: 'daily',
+          },
+          {
+            name: 'Weekly word count rolling average',
+            value: 'weekly',
+          },
+          {
+            name: 'Monthly word count rolling average',
+            value: 'monthly',
+          },
+        ],
+      }],
     },
     {
       name: 'digress',

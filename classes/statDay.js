@@ -29,14 +29,51 @@ class StatDay {
     return labels;
   }
 
-  static getChartData() {
+  static getChartDailyData() {
     const data = [];
     StatDay.statDays.forEach((day) => data.push(day.wordsPerDay));
     return data;
   }
 
-  static getChartUrl() {
-    return `https://quickchart.io/chart?bkg=black&c={type:'line',data:{labels:[${StatDay.getChartLabels()}],datasets:[{label:'TUTBAD Words per Day',data:[${StatDay.getChartData()}]}]}}`;
+  static ema(data, timePeriod) {
+    const k = 2 / (timePeriod + 1);
+    const emaData = [];
+    // eslint-disable-next-line prefer-destructuring
+    emaData[0] = data[0];
+    for (let i = 1; i < data.length; i += 1) {
+      const newPoint = (data[i] * k) + (emaData[i - 1] * (1 - k));
+      emaData.push(newPoint);
+    }
+    return emaData;
+  }
+
+  static getChartMonthlyData() {
+    const data = this.ema(StatDay.statDays.map((day) => day.wordsPerDay), 30);
+    return data;
+  }
+
+  static getChartWeeklyData() {
+    const data = this.ema(StatDay.statDays.map((day) => day.wordsPerDay), 7);
+    return data;
+  }
+
+  static getLabelObject(frequency) {
+    switch (frequency) {
+      case 'monthly':
+        return `{label:'TUTBAD Words per Month',data:[${StatDay.getChartMonthlyData()}]}`;
+      case 'weekly':
+        return `{label:'TUTBAD Words per Week',data:[${StatDay.getChartWeeklyData()}]}`;
+      case 'daily':
+        return `{label:'TUTBAD Words per Day',data:[${StatDay.getChartDailyData()}]}`;
+      default:
+        return `{label:'TUTBAD Words per Day',data:[${StatDay.getChartDailyData()}]}`;
+    }
+  }
+
+  static getChartUrl(frequency) {
+    return `https://quickchart.io/chart?bkg=black&c={type:'line',data:{labels:[${StatDay.getChartLabels()}],datasets:[
+      ${this.getLabelObject(frequency)}
+    ]}}`;
   }
 
   static initializeBaseDate() {

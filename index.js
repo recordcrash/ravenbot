@@ -93,7 +93,7 @@ client.on('interactionCreate', async (interaction) => {
     );
   }
 
-  function printStats(auth) {
+  function printDailyStats(auth) {
     const sheets = google.sheets({ version: 'v4', auth });
     sheets.spreadsheets.values.get(
       {
@@ -106,7 +106,45 @@ client.on('interactionCreate', async (interaction) => {
           interaction.reply(`Error contacting the Discord API: ${err}`);
           return console.log(`The API returned an error: ${err}`);
         }
-        getStatsFromSheet(res, interaction);
+        getStatsFromSheet(res, interaction, 'daily');
+        return true;
+      },
+    );
+  }
+
+  function printWeeklyStats(auth) {
+    const sheets = google.sheets({ version: 'v4', auth });
+    sheets.spreadsheets.values.get(
+      {
+        spreadsheetId: DUNGEONS_SPREADSHEET,
+        range: 'Speed Stats!A1:C90',
+        valueRenderOption: 'FORMULA',
+      },
+      (err, res) => {
+        if (err) {
+          interaction.reply(`Error contacting the Discord API: ${err}`);
+          return console.log(`The API returned an error: ${err}`);
+        }
+        getStatsFromSheet(res, interaction, 'weekly');
+        return true;
+      },
+    );
+  }
+
+  function printMonthlyStats(auth) {
+    const sheets = google.sheets({ version: 'v4', auth });
+    sheets.spreadsheets.values.get(
+      {
+        spreadsheetId: DUNGEONS_SPREADSHEET,
+        range: 'Speed Stats!A1:C90',
+        valueRenderOption: 'FORMULA',
+      },
+      (err, res) => {
+        if (err) {
+          interaction.reply(`Error contacting the Discord API: ${err}`);
+          return console.log(`The API returned an error: ${err}`);
+        }
+        getStatsFromSheet(res, interaction, 'monthly');
         return true;
       },
     );
@@ -156,10 +194,25 @@ client.on('interactionCreate', async (interaction) => {
   }
 
   if (interaction.commandName === 'stats') {
+    const frequency = interaction.options.getString('frequency');
     fs.readFile('./config/credentials.json', (err, content) => {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Sheets API.
-      authorize(JSON.parse(content), printStats, interaction);
+      switch (frequency) {
+        case 'daily':
+          authorize(JSON.parse(content), printDailyStats, interaction);
+          break;
+        case 'monthly':
+          authorize(JSON.parse(content), printMonthlyStats, interaction);
+          break;
+        case 'weekly':
+          authorize(JSON.parse(content), printWeeklyStats, interaction);
+          break;
+        default:
+          authorize(JSON.parse(content), printDailyStats, interaction);
+          break;
+      }
+
       return true;
     });
   }
