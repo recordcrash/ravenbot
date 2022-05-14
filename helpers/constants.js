@@ -218,6 +218,82 @@ const EXPLANATIONS = {
     name: 'Harry Potter and the Methods of Rationality',
     link: 'http://daystareld.com/hpmor-remix/',
   },
+  TWAIATB: {
+    name: 'The World As It Appears To Be',
+    link: 'https://archiveofourown.org/works/9402014/chapters/21285149',
+  },
+  CHILI: {
+    name: 'Chili and the Chocolate Factory',
+    link: 'https://www.fanfiction.net/s/13451176/1'
+  },
+  VS: {
+    name: 'Virtuous Sons',
+    link: 'https://www.royalroad.com/fiction/41330/virtuous-sons-a-greco-roman-xianxia',
+  },
+  KSBD: {
+    name: 'Kill Six Billion Demons',
+    link: 'https://killsixbilliondemons.com/comic/kill-six-billion-demons-chapter-1/',
+  },
+  K6BD: {
+    name: 'Kill Six Billion Demons',
+    link: 'https://killsixbilliondemons.com/comic/kill-six-billion-demons-chapter-1/',
+  },
+  THI: {
+    name: 'The Hawkshaw Inheritance',
+    link: 'https://hawkshawinheritance.wordpress.com/2021/08/29/chapter-one/',
+  },
+  HI: {
+    name: 'The Hawkshaw Inheritance',
+    link: 'https://hawkshawinheritance.wordpress.com/2021/08/29/chapter-one/',
+  },
+  TWW: {
+    name: 'The Winters Will',
+    link: 'https://thewinterswill.wordpress.com/',
+  },
+  ORV: {
+    name: 'Omniscient Reader\'s Viewpoint',
+    link: 'https://m.webtoons.com/en/action/omniscient-reader/episode-0-prologue/viewer?title_no=2154&episode_no=1',
+  },
+  HMGGH: {
+    name: 'Hiveminds Give Good Hugs',
+    link: 'https://www.royalroad.com/fiction/45048/',
+  },
+  HGGH: {
+    name: 'Hiveminds Give Good Hugs',
+    link: 'https://www.royalroad.com/fiction/45048/',
+  },
+  SFP: {
+    name: 'Strong Female Protagonist',
+    link: 'https://discord.com/channels/437695037401464851/437697099383963668/936439074544287784',
+  },
+  TMB: {
+    name: '12 Miles Below',
+    link: 'https://www.royalroad.com/fiction/42367',
+  },
+  PR: {
+    name: 'The Perfect Run',
+    link: 'https://www.royalroad.com/fiction/36735',
+  },
+  TPR: {
+    name: 'The Perfect Run',
+    link: 'https://www.royalroad.com/fiction/36735',
+  },
+  AA: {
+    name: 'Arcane Ascension',
+    link: 'https://discord.com/channels/437695037401464851/437697099383963668/848202602688282655',
+  },
+  TNC: {
+    name: 'The Northern Caves',
+    link: 'https://archiveofourown.org/works/3659997',
+  },
+  UNSONG: {
+    name: 'Unsong',
+    link: 'https://unsongbook.com/',
+  },
+  WORM: {
+    name: 'Worm',
+    link: 'https://parahumans.wordpress.com'
+  },
 };
 
 const IMAGE_URLS = {
