@@ -314,7 +314,7 @@ client.on("messageCreate", async (message) => {
     initializeCommands(client);
   }
   if (command === "hey") {
-    var webhook = (await message.channel.fetchWebhooks()).values()[0];
+    var webhook = (await message.channel.fetchWebhooks()).values().next().value;
 
     if (!webhook) {
       webhook = await message.channel.createWebhook("WebHook");
