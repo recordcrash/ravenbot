@@ -197,8 +197,22 @@ client.on("interactionCreate", async (interaction) => {
         "https://www.royalroadcdn.com/public/avatars/avatar-119608.png"
       )
       .setDescription(powerDescription);
+    const messages = await getAIResponse(
+      "Everyman",
+      `Can you please generate a random ${
+        method == "entad" ? "magical item" : "superpower"
+      } that fits the description '${powerDescription}'?`,
+      interaction.channelId,
+      interaction.member.user.tag.split("#")[0]
+    );
+
+    const explainationEmbed = new MessageEmbed()
+      .setColor("#A4DACC")
+      .setAuthor(messages[0].username, messages[0].avatar_url)
+      .setDescription(messages[0].content);
+
     interaction.reply({
-      embeds: [powerEmbed],
+      embeds: [powerEmbed, explainationEmbed],
       allowedMentions: { repliedUser: false },
     });
   }
