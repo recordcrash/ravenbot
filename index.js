@@ -63,6 +63,7 @@ client.on("ready", () => {
     `Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.`
   );
   client.user.setPresence({ activities: [{ name: "exposition fairy" }] });
+
   /* set avatar (only needs to be done once)
   client.user.setAvatar('./images/raven.jpg')
     .then(() => console.log('Avatar set!'))
