@@ -50,7 +50,7 @@ async function getAIResponse(id, message, server, callingUser = "Person") {
       embeds: [
         {
           description:
-            "Bots too powerful... Wiping memory banks... Checking resources... ",
+            "Bots too powerful... Wiping memory banks... Checking [resources](https://www.patreon.com/unexplored_Horizons/)... ",
         },
       ],
       avatar_url:
