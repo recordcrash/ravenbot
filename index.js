@@ -272,10 +272,50 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+const doAIStuff = (message,args) => {
+  const allowedChannels = JSON.parse(
+    fs.readFileSync("./gpt3/allowedChannels.json")
+  ).channels;
+  if (!allowedChannels.includes(message.channelId)) {
+    client.channels.fetch(adminChannel).then((channel) => {
+      channel.send(
+        `${message.member.user.username} tried to use the hey command in ${message.channel.name} of ${message.guild.name}, use [-authorise ${message.channel.id}] to allow this.`
+      );
+      message.reply("Your channel is pending approval...");
+    });
+  } else {
+    var webhook = (await message.channel.fetchWebhooks())
+      .values()
+      .next().value;
+    if (!webhook) {
+      webhook = await message.channel.createWebhook("WebHook");
+    }
+    const messages = await getAIResponse(
+      args[0],
+      args.slice(1).join(" "),
+      message.channelId,
+      message.member.user.tag.split("#")[0]
+    );
+    messages.map((newmessage) =>
+      webhook.send({
+        content: newmessage.content,
+        avatarURL: newmessage.avatar_url,
+        username: newmessage.username,
+        embeds: newmessage.embeds,
+      })
+    );
+  }
+};
 // Regular commands
 client.on("messageCreate", async (message) => {
   if (BANNED_CHANNEL_IDS.includes(message.channel.id)) return;
+
   if (message.author.bot) return;
+
+  if (message.mentions?.repliedUser?.bot) {
+    doAIStuff(message,[message.mentions.repliedUser.username,message.content]);
+  }
+
   if (message.content.indexOf(config.prefix) !== 0) return;
 
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
@@ -345,39 +385,9 @@ client.on("messageCreate", async (message) => {
       channel.send("Hi! You have been approved for Writerbot in this channel!");
     });
   }
-  if (command === "hey") {
-    const allowedChannels = JSON.parse(
-      fs.readFileSync("./gpt3/allowedChannels.json")
-    ).channels;
-    if (!allowedChannels.includes(message.channelId)) {
-      client.channels.fetch(adminChannel).then((channel) => {
-        channel.send(
-          `${message.member.user.username} tried to use the hey command in ${message.channel.name} of ${message.guild.name}, use [-authorise ${message.channel.id}] to allow this.`
-        );
-        message.reply("Your channel is pending approval...");
-      });
-    } else {
-      var webhook = (await message.channel.fetchWebhooks())
-        .values()
-        .next().value;
-      if (!webhook) {
-        webhook = await message.channel.createWebhook("WebHook");
-      }
-      const messages = await getAIResponse(
-        args[0],
-        args.slice(1).join(" "),
-        message.channelId,
-        message.member.user.tag.split("#")[0]
-      );
-      messages.map((newmessage) =>
-        webhook.send({
-          content: newmessage.content,
-          avatarURL: newmessage.avatar_url,
-          username: newmessage.username,
-          embeds: newmessage.embeds,
-        })
-      );
-    }
+  console.log(message);
+  if (command === "hey" || message.repliedUser.bot) {
+    doAIStuff(message,args);
   }
 });
 
