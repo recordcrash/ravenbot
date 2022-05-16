@@ -272,7 +272,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-const doAIStuff = (message,args) => {
+const doAIStuff = async (message, args) => {
   const allowedChannels = JSON.parse(
     fs.readFileSync("./gpt3/allowedChannels.json")
   ).channels;
@@ -284,9 +284,7 @@ const doAIStuff = (message,args) => {
       message.reply("Your channel is pending approval...");
     });
   } else {
-    var webhook = (await message.channel.fetchWebhooks())
-      .values()
-      .next().value;
+    var webhook = (await message.channel.fetchWebhooks()).values().next().value;
     if (!webhook) {
       webhook = await message.channel.createWebhook("WebHook");
     }
@@ -313,7 +311,10 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   if (message.mentions?.repliedUser?.bot) {
-    doAIStuff(message,[message.mentions.repliedUser.username,message.content]);
+    doAIStuff(message, [
+      message.mentions.repliedUser.username,
+      message.content,
+    ]);
   }
 
   if (message.content.indexOf(config.prefix) !== 0) return;
@@ -387,7 +388,7 @@ client.on("messageCreate", async (message) => {
   }
   console.log(message);
   if (command === "hey" || message.repliedUser.bot) {
-    doAIStuff(message,args);
+    doAIStuff(message, args);
   }
 });
 
