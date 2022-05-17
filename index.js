@@ -387,7 +387,7 @@ client.on("messageCreate", async (message) => {
     });
   }
   console.log(message);
-  if (command === "hey" || message.repliedUser.bot) {
+  if (command === "hey") {
     doAIStuff(message, args);
   }
 });
