@@ -63,6 +63,7 @@ client.on("ready", () => {
     `Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.`
   );
   client.user.setPresence({ activities: [{ name: "exposition fairy" }] });
+
   /* set avatar (only needs to be done once)
   client.user.setAvatar('./images/raven.jpg')
     .then(() => console.log('Avatar set!'))
@@ -197,8 +198,22 @@ client.on("interactionCreate", async (interaction) => {
         "https://www.royalroadcdn.com/public/avatars/avatar-119608.png"
       )
       .setDescription(powerDescription);
+    const messages = await getAIResponse(
+      "Everyman",
+      `Can you please generate a random ${
+        method == "entad" ? "magical item" : "superpower"
+      } that fits the description '${powerDescription}'?`,
+      interaction.channelId,
+      interaction.member.user.tag.split("#")[0]
+    );
+
+    const explainationEmbed = new MessageEmbed()
+      .setColor("#A4DACC")
+      .setAuthor(messages[0].username, messages[0].avatar_url)
+      .setDescription(messages[0].content);
+
     interaction.reply({
-      embeds: [powerEmbed],
+      embeds: [powerEmbed, explainationEmbed],
       allowedMentions: { repliedUser: false },
     });
   }
@@ -257,10 +272,51 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+const doAIStuff = async (message, args) => {
+  // const allowedChannels = JSON.parse(
+  //   fs.readFileSync("./gpt3/allowedChannels.json")
+  // ).channels;
+  // if (!allowedChannels.includes(message.channelId)) {
+  //   client.channels.fetch(adminChannel).then((channel) => {
+  //     channel.send(
+  //       `${message.member.user.username} tried to use the hey command in ${message.channel.name} of ${message.guild.name}, use [-authorise ${message.channel.id}] to allow this.`
+  //     );
+  //     message.reply("Your channel is pending approval...");
+  //   });
+  // } else {
+  var webhook = (await message.channel.fetchWebhooks()).values().next().value;
+  if (!webhook) {
+    webhook = await message.channel.createWebhook("WebHook");
+  }
+  const messages = await getAIResponse(
+    args[0],
+    args.slice(1).join(" "),
+    message.channelId,
+    message.member.user.tag.split("#")[0]
+  );
+  messages.map((newmessage) =>
+    webhook.send({
+      content: newmessage.content,
+      avatarURL: newmessage.avatar_url,
+      username: newmessage.username,
+      embeds: newmessage.embeds,
+    })
+  );
+  // }
+};
 // Regular commands
 client.on("messageCreate", async (message) => {
   if (BANNED_CHANNEL_IDS.includes(message.channel.id)) return;
+
   if (message.author.bot) return;
+
+  if (message.mentions?.repliedUser?.bot) {
+    doAIStuff(message, [
+      message.mentions.repliedUser.username,
+      message.content,
+    ]);
+  }
+
   if (message.content.indexOf(config.prefix) !== 0) return;
 
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
@@ -313,28 +369,26 @@ client.on("messageCreate", async (message) => {
   if (command === "initializecommands") {
     initializeCommands(client);
   }
+  console.log(message.channelId);
+  const adminChannel = "973891057139974144";
+
+  // if (command === "authorise" && message.channelId === adminChannel) {
+  //   const allowedChannels = JSON.parse(
+  //     fs.readFileSync("./gpt3/allowedChannels.json")
+  //   );
+  //   allowedChannels.channels.push(args[0]);
+  //   fs.writeFileSync(
+  //     "./gpt3/allowedChannels.json",
+  //     JSON.stringify(allowedChannels)
+  //   );
+  //   message.reply("Channel added to allowed channels.");
+  //   client.channels.fetch(args[0]).then((channel) => {
+  //     channel.send("Hi! You have been approved for Writerbot in this channel!");
+  //   });
+  // }
+  console.log(message);
   if (command === "hey") {
-    var webhook = (await message.channel.fetchWebhooks()).values[0];
-
-    if (!webhook) {
-      webhook = await message.channel.createWebhook("WebHook");
-    }
-
-    const messages = await getAIResponse(
-      args[0],
-      args.slice(1).join(" "),
-      message.channelId,
-      message.member.user.tag.split("#")[0]
-    );
-
-    messages.map((newmessage) =>
-      webhook.send({
-        content: newmessage.content,
-        avatarURL: newmessage.avatar_url,
-        username: newmessage.username,
-        embeds: newmessage.embeds,
-      })
-    );
+    doAIStuff(message, args);
   }
 });
 

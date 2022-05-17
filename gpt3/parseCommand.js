@@ -7,7 +7,7 @@ async function getAIResponse(id, message, server, callingUser = "Person") {
   const char = chars.find((ch) =>
     ch.name.toLowerCase().includes(id.split(",").join("").toLowerCase())
   );
-  if (!char) return;
+  if (!char) return [];
   const current = mem ? mem : "";
   const calling =
     current +
@@ -50,7 +50,7 @@ async function getAIResponse(id, message, server, callingUser = "Person") {
       embeds: [
         {
           description:
-            "Bots too powerful... Wiping memory banks... Checking resources... ",
+            "Bots too powerful... Wiping memory banks... Checking Resources",
         },
       ],
       avatar_url:
