@@ -273,36 +273,36 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 const doAIStuff = async (message, args) => {
-  const allowedChannels = JSON.parse(
-    fs.readFileSync("./gpt3/allowedChannels.json")
-  ).channels;
-  if (!allowedChannels.includes(message.channelId)) {
-    client.channels.fetch(adminChannel).then((channel) => {
-      channel.send(
-        `${message.member.user.username} tried to use the hey command in ${message.channel.name} of ${message.guild.name}, use [-authorise ${message.channel.id}] to allow this.`
-      );
-      message.reply("Your channel is pending approval...");
-    });
-  } else {
-    var webhook = (await message.channel.fetchWebhooks()).values().next().value;
-    if (!webhook) {
-      webhook = await message.channel.createWebhook("WebHook");
-    }
-    const messages = await getAIResponse(
-      args[0],
-      args.slice(1).join(" "),
-      message.channelId,
-      message.member.user.tag.split("#")[0]
-    );
-    messages.map((newmessage) =>
-      webhook.send({
-        content: newmessage.content,
-        avatarURL: newmessage.avatar_url,
-        username: newmessage.username,
-        embeds: newmessage.embeds,
-      })
-    );
+  // const allowedChannels = JSON.parse(
+  //   fs.readFileSync("./gpt3/allowedChannels.json")
+  // ).channels;
+  // if (!allowedChannels.includes(message.channelId)) {
+  //   client.channels.fetch(adminChannel).then((channel) => {
+  //     channel.send(
+  //       `${message.member.user.username} tried to use the hey command in ${message.channel.name} of ${message.guild.name}, use [-authorise ${message.channel.id}] to allow this.`
+  //     );
+  //     message.reply("Your channel is pending approval...");
+  //   });
+  // } else {
+  var webhook = (await message.channel.fetchWebhooks()).values().next().value;
+  if (!webhook) {
+    webhook = await message.channel.createWebhook("WebHook");
   }
+  const messages = await getAIResponse(
+    args[0],
+    args.slice(1).join(" "),
+    message.channelId,
+    message.member.user.tag.split("#")[0]
+  );
+  messages.map((newmessage) =>
+    webhook.send({
+      content: newmessage.content,
+      avatarURL: newmessage.avatar_url,
+      username: newmessage.username,
+      embeds: newmessage.embeds,
+    })
+  );
+  // }
 };
 // Regular commands
 client.on("messageCreate", async (message) => {
@@ -372,20 +372,20 @@ client.on("messageCreate", async (message) => {
   console.log(message.channelId);
   const adminChannel = "973891057139974144";
 
-  if (command === "authorise" && message.channelId === adminChannel) {
-    const allowedChannels = JSON.parse(
-      fs.readFileSync("./gpt3/allowedChannels.json")
-    );
-    allowedChannels.channels.push(args[0]);
-    fs.writeFileSync(
-      "./gpt3/allowedChannels.json",
-      JSON.stringify(allowedChannels)
-    );
-    message.reply("Channel added to allowed channels.");
-    client.channels.fetch(args[0]).then((channel) => {
-      channel.send("Hi! You have been approved for Writerbot in this channel!");
-    });
-  }
+  // if (command === "authorise" && message.channelId === adminChannel) {
+  //   const allowedChannels = JSON.parse(
+  //     fs.readFileSync("./gpt3/allowedChannels.json")
+  //   );
+  //   allowedChannels.channels.push(args[0]);
+  //   fs.writeFileSync(
+  //     "./gpt3/allowedChannels.json",
+  //     JSON.stringify(allowedChannels)
+  //   );
+  //   message.reply("Channel added to allowed channels.");
+  //   client.channels.fetch(args[0]).then((channel) => {
+  //     channel.send("Hi! You have been approved for Writerbot in this channel!");
+  //   });
+  // }
   console.log(message);
   if (command === "hey") {
     doAIStuff(message, args);
