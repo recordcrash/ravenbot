@@ -369,6 +369,45 @@ client.on("messageCreate", async (message) => {
   if (command === "initializecommands") {
     initializeCommands(client);
   }
+  
+   if (command === "picture") {
+    const loadingMessage = await message.reply("I'm working on it...");
+    WomboDreamApi.buildDefaultInstance()
+      .generatePicture(args.join(" "), 10, (task: { [key: string]: any }) => {
+        loadingMessage.edit({
+          content: null,
+          embeds: [
+            {
+              title: "Generating picture...",
+              description: `${task.state}:${task.photo_url_list.length * 5.0}%`,
+              image: {
+                url: task.photo_url_list[task.photo_url_list.length - 1],
+              },
+            },
+          ],
+        });
+        console.log(task.state, "stage", task?.photo_url_list?.length);
+      })
+      .then(async (task: { [key: string]: any }) => {
+        loadingMessage.edit({
+          content: null,
+          embeds: [
+            {
+              title: args.join(" "),
+              description: `Completed`,
+              image: {
+                url: task?.result?.final,
+              },
+            },
+          ],
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        loadingMessage.edit("Something went wrong");
+      });
+  }
+  
   console.log(message.channelId);
   const adminChannel = "973891057139974144";
 
