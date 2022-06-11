@@ -48,6 +48,8 @@ const clientOptions = {
   ],
 };
 
+const WomboDreamApi = require("wombo-dream-api");
+
 // Invite URL
 // https://discord.com/oauth2/authorize?client_id=872531052420280372&scope=bot+applications.commands&permissions=260316196049
 
