@@ -180,55 +180,54 @@ client.on("interactionCreate", async (interaction) => {
   if (command === "createwoman") {
     const loadingMessage = await message.reply("I'm working on it...");
     const instance = WomboDreamApi.buildDefaultInstance();
+    // get data from message attachment
 
-    await instance
-      .uploadImage(readFileSync(__dirname + "/girl3.jpeg"))
-      .then((uploadedImageInfo) => {
-        instance
-          .generatePicture(
-            `${args.join(" ")}`,
-            10,
-            (task) => {
-              loadingMessage.edit({
-                content: null,
-                embeds: [
-                  {
-                    title: "Generating picture...",
-                    description: `${task.state}:${
-                      task.photo_url_list.length * 5.0
-                    }%`,
-                    image: {
-                      url: task.photo_url_list[task.photo_url_list.length - 1],
-                    },
-                  },
-                ],
-              });
-              console.log(task.state, "stage", task?.photo_url_list?.length);
-            },
-            {
-              mediastore_id: uploadedImageInfo.id,
-              weight: "MEDIUM",
-            }
-          )
-          .then(async (task) => {
+    await instance.uploadImage(data).then((uploadedImageInfo) => {
+      instance
+        .generatePicture(
+          `${args.join(" ")}`,
+          10,
+          (task) => {
             loadingMessage.edit({
               content: null,
               embeds: [
                 {
-                  title: args.join(" "),
-                  description: `Completed`,
+                  title: "Generating picture...",
+                  description: `${task.state}:${
+                    task.photo_url_list.length * 5.0
+                  }%`,
                   image: {
-                    url: task?.result?.final,
+                    url: task.photo_url_list[task.photo_url_list.length - 1],
                   },
                 },
               ],
             });
-          })
-          .catch((err) => {
-            console.log(err);
-            loadingMessage.edit("Something went wrong");
+            console.log(task.state, "stage", task?.photo_url_list?.length);
+          },
+          {
+            mediastore_id: uploadedImageInfo.id,
+            weight: "MEDIUM",
+          }
+        )
+        .then(async (task) => {
+          loadingMessage.edit({
+            content: null,
+            embeds: [
+              {
+                title: args.join(" "),
+                description: `Completed`,
+                image: {
+                  url: task?.result?.final,
+                },
+              },
+            ],
           });
-      });
+        })
+        .catch((err) => {
+          console.log(err);
+          loadingMessage.edit("Something went wrong");
+        });
+    });
   }
 
   if (interaction.commandName === "power") {
