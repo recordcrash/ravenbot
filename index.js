@@ -375,7 +375,7 @@ client.on("messageCreate", async (message) => {
    if (command === "picture") {
     const loadingMessage = await message.reply("I'm working on it...");
     WomboDreamApi.buildDefaultInstance()
-      .generatePicture(args.join(" "), 10, (task: { [key: string]: any }) => {
+      .generatePicture(args.join(" "), 10, (task) => {
         loadingMessage.edit({
           content: null,
           embeds: [
@@ -390,7 +390,7 @@ client.on("messageCreate", async (message) => {
         });
         console.log(task.state, "stage", task?.photo_url_list?.length);
       })
-      .then(async (task: { [key: string]: any }) => {
+      .then(async (task) => {
         loadingMessage.edit({
           content: null,
           embeds: [
