@@ -57,6 +57,7 @@ storage.initSync();
 // Initialize discord client
 const client = new Client(clientOptions);
 
+const WomboDreamApi = require("wombo-dream-api");
 // Finally, Ravenbot Begins
 client.on("ready", () => {
   console.log(
