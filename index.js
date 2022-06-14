@@ -48,8 +48,6 @@ const clientOptions = {
   ],
 };
 
-const WomboDreamApi = require("wombo-dream-api");
-
 // Invite URL
 // https://discord.com/oauth2/authorize?client_id=872531052420280372&scope=bot+applications.commands&permissions=260316196049
 
@@ -371,8 +369,8 @@ client.on("messageCreate", async (message) => {
   if (command === "initializecommands") {
     initializeCommands(client);
   }
-  
-   if (command === "picture") {
+
+  if (command === "picture") {
     const loadingMessage = await message.reply("I'm working on it...");
     WomboDreamApi.buildDefaultInstance()
       .generatePicture(args.join(" "), 10, (task) => {
@@ -409,7 +407,7 @@ client.on("messageCreate", async (message) => {
         loadingMessage.edit("Something went wrong");
       });
   }
-  
+
   console.log(message.channelId);
   const adminChannel = "973891057139974144";
 
