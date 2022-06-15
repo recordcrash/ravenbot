@@ -35,6 +35,59 @@ const { giveRoleToUser } = require("./commands/roleCommands");
 const { initializeCommands } = require("./commands/managementCommands");
 const config = require("./config/config.json");
 const { getAIResponse } = require("./gpt3/parseCommand");
+const pngToJpeg = require("png-to-jpeg");
+
+const createFromImage = async (message, imageData, prompt, level, style) => {
+  const loadingMessage = await message.reply("I'm working on it...");
+  const instance = WomboDreamApi.buildDefaultInstance();
+
+  await instance.uploadImage(imageData).then((uploadedImageInfo) => {
+    instance
+      .generatePicture(
+        prompt,
+        style,
+        (task) => {
+          loadingMessage.edit({
+            content: null,
+            embeds: [
+              {
+                title: "Generating picture...",
+                description: `${task.state}:${
+                  task.photo_url_list.length * 5.0
+                }%`,
+                image: {
+                  url: task.photo_url_list[task.photo_url_list.length - 1],
+                },
+              },
+            ],
+          });
+          console.log(task.state, "stage", task?.photo_url_list?.length);
+        },
+        {
+          mediastore_id: uploadedImageInfo.id,
+          weight: level,
+        }
+      )
+      .then(async (task) => {
+        loadingMessage.edit({
+          content: `Completed (hint: -remix style=10 dictates style number level=HIGH|MEDIUM|LOW level dictates how much of the original picture bleeds through)`,
+          embeds: [
+            {
+              title: prompt,
+              description: " ",
+              image: {
+                url: task?.result?.final,
+              },
+            },
+          ],
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        loadingMessage.edit("Something went wrong");
+      });
+  });
+};
 
 // Client options with intents for new Discord API v9
 const clientOptions = {
@@ -176,6 +229,75 @@ client.on("interactionCreate", async (interaction) => {
       embeds: [getHelpEmbed()],
       allowedMentions: { repliedUser: false },
     });
+  }
+
+  if (command == "remix") {
+    const config = args
+      .filter((arg) => arg.includes("="))
+      .reduce((acc, cur) => {
+        const [key, value] = cur.split("=");
+        acc[key] = value;
+        return acc;
+      }, {});
+    var attachment = message.attachments.values().next().value;
+    if (message.mentions.repliedUser) {
+      const replymessage = await message.channel.messages.fetch(
+        message.reference.messageId
+      );
+      attachment = replymessage.attachments.values().next().value;
+      if (replymessage.embeds.length > 0) {
+        const embed = replymessage.embeds[0];
+        if (embed.image) {
+          attachment = {
+            url: embed.image.url,
+            contentType: "image/jpeg",
+          };
+        }
+      }
+    }
+
+    if (!attachment) {
+      message.reply("Please attach or reply an image");
+      return;
+    }
+    // check if not png or jpeg
+    if (
+      attachment.contentType != "image/png" &&
+      attachment.contentType != "image/jpeg" &&
+      attachment.contentType != "image/jpg"
+    ) {
+      message.reply("Please attach a png or jpeg image");
+      return;
+    }
+
+    axios
+      .get(
+        attachment.url, //your url
+        { responseType: "arraybuffer", responseEncoding: "binary" }
+      )
+      .then(async (response) => {
+        const imageData = await response.data;
+
+        const prompt = args.filter((arg) => !arg.includes("=")).join(" ");
+        if (attachment.contentType == "image/png") {
+          const jpegData = await pngToJpeg({ quality: 90 })(imageData);
+          createFromImage(
+            message,
+            jpegData,
+            prompt,
+            config.level,
+            Number(config.style ?? "10")
+          );
+        } else {
+          createFromImage(
+            message,
+            imageData,
+            prompt,
+            config.level,
+            Number(config.style ?? "10")
+          );
+        }
+      });
   }
 
   if (interaction.commandName === "power") {
