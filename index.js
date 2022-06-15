@@ -231,74 +231,6 @@ client.on("interactionCreate", async (interaction) => {
     });
   }
 
-  if (command == "remix") {
-    const config = args
-      .filter((arg) => arg.includes("="))
-      .reduce((acc, cur) => {
-        const [key, value] = cur.split("=");
-        acc[key] = value;
-        return acc;
-      }, {});
-    var attachment = message.attachments.values().next().value;
-    if (message.mentions.repliedUser) {
-      const replymessage = await message.channel.messages.fetch(
-        message.reference.messageId
-      );
-      attachment = replymessage.attachments.values().next().value;
-      if (replymessage.embeds.length > 0) {
-        const embed = replymessage.embeds[0];
-        if (embed.image) {
-          attachment = {
-            url: embed.image.url,
-            contentType: "image/jpeg",
-          };
-        }
-      }
-    }
-
-    if (!attachment) {
-      message.reply("Please attach or reply an image");
-      return;
-    }
-    // check if not png or jpeg
-    if (
-      attachment.contentType != "image/png" &&
-      attachment.contentType != "image/jpeg" &&
-      attachment.contentType != "image/jpg"
-    ) {
-      message.reply("Please attach a png or jpeg image");
-      return;
-    }
-
-    axios
-      .get(
-        attachment.url, //your url
-        { responseType: "arraybuffer", responseEncoding: "binary" }
-      )
-      .then(async (response) => {
-        const imageData = await response.data;
-
-        const prompt = args.filter((arg) => !arg.includes("=")).join(" ");
-        if (attachment.contentType == "image/png") {
-          const jpegData = await pngToJpeg({ quality: 90 })(imageData);
-          createFromImage(
-            message,
-            jpegData,
-            prompt,
-            config.level,
-            Number(config.style ?? "10")
-          );
-        } else {
-          createFromImage(
-            message,
-            imageData,
-            prompt,
-            config.level,
-            Number(config.style ?? "10")
-          );
-        }
-      });
-  }
 
   if (interaction.commandName === "power") {
     const method = interaction.options.getString("method");
@@ -444,6 +376,76 @@ client.on("messageCreate", async (message) => {
 
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
+
+  
+  if (command == "remix") {
+    const config = args
+      .filter((arg) => arg.includes("="))
+      .reduce((acc, cur) => {
+        const [key, value] = cur.split("=");
+        acc[key] = value;
+        return acc;
+      }, {});
+    var attachment = message.attachments.values().next().value;
+    if (message.mentions.repliedUser) {
+      const replymessage = await message.channel.messages.fetch(
+        message.reference.messageId
+      );
+      attachment = replymessage.attachments.values().next().value;
+      if (replymessage.embeds.length > 0) {
+        const embed = replymessage.embeds[0];
+        if (embed.image) {
+          attachment = {
+            url: embed.image.url,
+            contentType: "image/jpeg",
+          };
+        }
+      }
+    }
+
+    if (!attachment) {
+      message.reply("Please attach or reply an image");
+      return;
+    }
+    // check if not png or jpeg
+    if (
+      attachment.contentType != "image/png" &&
+      attachment.contentType != "image/jpeg" &&
+      attachment.contentType != "image/jpg"
+    ) {
+      message.reply("Please attach a png or jpeg image");
+      return;
+    }
+
+    axios
+      .get(
+        attachment.url, //your url
+        { responseType: "arraybuffer", responseEncoding: "binary" }
+      )
+      .then(async (response) => {
+        const imageData = await response.data;
+
+        const prompt = args.filter((arg) => !arg.includes("=")).join(" ");
+        if (attachment.contentType == "image/png") {
+          const jpegData = await pngToJpeg({ quality: 90 })(imageData);
+          createFromImage(
+            message,
+            jpegData,
+            prompt,
+            config.level,
+            Number(config.style ?? "10")
+          );
+        } else {
+          createFromImage(
+            message,
+            imageData,
+            prompt,
+            config.level,
+            Number(config.style ?? "10")
+          );
+        }
+      });
+  }
 
   if (message.member) {
     console.log(
