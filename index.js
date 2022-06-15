@@ -434,7 +434,8 @@ client.on("messageCreate", async (message) => {
           return acc;
         },
         {
-          level: "3",
+          level: "HIGH",
+          style: "3",
         }
       );
     var attachment = message.attachments.values().next().value;
