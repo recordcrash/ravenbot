@@ -379,22 +379,49 @@ client.on("messageCreate", async (message) => {
 
   if (command === "styles") {
     // get styles
+
     const styles = await WomboDreamApi.buildDefaultInstance().fetchStyles();
+
     const buttons = styles.map((style) => ({
       type: "BUTTON",
-      text: style.id + " : " + style.name,
+
+      custom_id: style.id,
+      style: "PRIMARY",
+      label: style.id + " : " + style.name,
     }));
     const components = [];
     for (let i = 0; i < buttons.length; i += 5) {
-      const chunk = array.slice(i, i + chunkSize);
-      components.push({
-        type: "ACTION_ROW",
-        components: chunk,
-      });
+      const chunk = buttons.slice(i, i + 5);
+      components.push({ components: chunk, type: "ACTION_ROW" });
       // do whatever
     }
-    const message = message.channel.send({
+    const outMessage = await message.channel.send({
+      content: "Available Styles, Click to view",
       components: components,
+    });
+    const collector = outMessage.createMessageComponentCollector({
+      time: 30000,
+    });
+    collector.on("end", async (m) => {
+      outMessage.delete();
+    });
+    collector.on("collect", async (i) => {
+      const style = styles.find((s) => `${s.id}` == i.customId);
+      if (!style) return;
+      await i.update({
+        content: "Available Styles, Click to view",
+        embeds: [
+          {
+            title: style.name,
+            description: "number: " + style.id,
+            image: {
+              url: style.photo_url,
+            },
+          },
+        ],
+        components: components,
+      });
+      return;
     });
   }
   if (command == "remix") {
