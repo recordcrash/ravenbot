@@ -36,7 +36,7 @@ const { initializeCommands } = require("./commands/managementCommands");
 const config = require("./config/config.json");
 const { getAIResponse } = require("./gpt3/parseCommand");
 const pngToJpeg = require("png-to-jpeg");
-const axios = require("axios")
+const axios = require("axios");
 
 const createFromImage = async (message, imageData, prompt, level, style) => {
   const loadingMessage = await message.reply("I'm working on it...");
@@ -232,7 +232,6 @@ client.on("interactionCreate", async (interaction) => {
     });
   }
 
-
   if (interaction.commandName === "power") {
     const method = interaction.options.getString("method");
     let powerDescription = "Power failed to generate.";
@@ -378,15 +377,39 @@ client.on("messageCreate", async (message) => {
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
 
-  
+  if (command === "styles") {
+    // get styles
+    const styles = await WomboDreamApi.buildDefaultInstance().fetchStyles();
+    const buttons = styles.map((style) => ({
+      type: "BUTTON",
+      text: style.id + " : " + style.name,
+    }));
+    const components = [];
+    for (let i = 0; i < buttons.length; i += 5) {
+      const chunk = array.slice(i, i + chunkSize);
+      components.push({
+        type: "ACTION_ROW",
+        components: chunk,
+      });
+      // do whatever
+    }
+    const message = message.channel.send({
+      components: components,
+    });
+  }
   if (command == "remix") {
     const config = args
       .filter((arg) => arg.includes("="))
-      .reduce((acc, cur) => {
-        const [key, value] = cur.split("=");
-        acc[key] = value;
-        return acc;
-      }, {});
+      .reduce(
+        (acc, cur) => {
+          const [key, value] = cur.split("=");
+          acc[key] = value;
+          return acc;
+        },
+        {
+          level: "3",
+        }
+      );
     var attachment = message.attachments.values().next().value;
     if (message.mentions.repliedUser) {
       const replymessage = await message.channel.messages.fetch(
