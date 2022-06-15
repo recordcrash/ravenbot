@@ -36,6 +36,7 @@ const { initializeCommands } = require("./commands/managementCommands");
 const config = require("./config/config.json");
 const { getAIResponse } = require("./gpt3/parseCommand");
 const pngToJpeg = require("png-to-jpeg");
+const axios = require("axios")
 
 const createFromImage = async (message, imageData, prompt, level, style) => {
   const loadingMessage = await message.reply("I'm working on it...");
